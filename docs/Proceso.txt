@@ -1,0 +1,212 @@
+Como iniciar un proyecto Django + React (https://www.youtube.com/watch?v=Fg0OZqLbaJE)
+
+Comandos acceso rapido
+#######################################################################
+
+npm run dev 		    (FrontEnd)
+python manage.py runserver  (BackEnd)
+
+.\env\Scripts\activate (Iniciar Entorno Virtual)
+
+django-admin startapp nombre      (Crear Nuevas Apps en /apps)
+python manage.py startapp nombre  (Crear nuevas Apps)
+python manage.py makemigrations   (Actualiza Bases de Datos)
+python manage.py migrate   	  	  (Actualiza Bases de Datos)
+
+pip freeze > requirements.txt 	(Requerimientos)
+pip install -r requirements.txt (Instalar Requerimientos)
+
+
+python manage.py createsuperuser (crea user admin)
+- jesus / 23072000Frost. /jesuscardenas2000@gmail.com
+#######################################################################
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+1)Preparacion del Entorno Virtual
+
+ 1.1- Inicia el entorno virtual en una carpeta para tu proyecto , ejecutando:
+	python -m venv env (siendo 'env' el nombre del entorno virtual)
+
+ 1.2- Ejecuta el script activate para que se creen las bases, ejecutando:
+	.\env\Scripts\activate
+
+ 1.3- Instala Django , ejecutando
+	pip install Django
+
+ 1.4- Crea el proyecto , ejecutando:
+	django-admin startproject nombreproyecto 
+(si es el mismo que el de la carpeta cambiar por django-admin startproject nombreproyecto .)
+ 
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+2)Abre tu proyecto en tu IDE ( si es VsCode instala Python como extension )
+
+ 2.0- Solución error script automático
+	Deberia de ejecutar el script de inicio del entorno virtual creado 'env' solo, si windows no te deja:
+		2.0.1- Abre Windows PowerShell con admin y cambia el permiso de ejecucion de scripts ajenos, ejecutando:
+			Set-ExecutionPolicy RemoteSigned
+		2.0.2- Especifica la ruta del script a ejecutar, en concreto el visual nos da la ruta del script que no se pudo ejecutar.
+			>> c:/Users/Alvaro/Desktop/DnDApp35e/env/Scripts/Activate.ps1
+
+ 2.1- Ejecuta la aplicación en la ruta por defecto http://localhost:8000/
+	 python manage.py runserver
+ 
+ 2.2- Solucionar Errores de Inicio (faltan bases de datos porque están vacías por defecto)
+	
+	2.2.1- En otra consola, migra las tablas básicas de python ejecutando:
+		python manage.py migrate
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+3)Inicia tu aplicacion
+
+ 3.0- Crea el proyecto, ejecutando:
+	python manage.py startapp nombre
+
+ 3.1- Crea los modelos de las tablas de la base de datos que persistan
+	 3.1.1 Rellena models.py del nuevo proyecto 
+ 		ejemplo: class Personaje(models.Model):
+				nombre=models.CharField(max_lenght=100)
+
+ 3.2- Manda el codigo para que cree el script,ejecutando:
+	python manage.py makemigrations nombreproyecto
+	
+	3.2.1 Solución del error no hay instalado ninguna app con la etiqueta nombreProyecto
+		
+		Añadir el nombre del proyecto en settings.py del proyecto grande en installed_apps, ejemplo:
+		
+		INSTALLED_APPS = [
+    			'django.contrib.admin',
+    			'django.contrib.auth',
+    			'django.contrib.contenttypes',
+    			'django.contrib.sessions',
+   			'django.contrib.messages',
+    			'django.contrib.staticfiles',
+
+   			 'DnDApp',
+		]
+ 3.3- Ejecuta el script de la creacion de la DB:
+	python manage.py migrate
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+4)Creacion de la API
+
+ 4.0- Instala el paquete django REST Framework
+	pip install djangorestframework
+
+ 4.1- Añadelo al Paquete de APPS del proyecto grande como 'rest_framework'
+	INSTALLED_APPS = [
+    			'django.contrib.admin',
+    			'django.contrib.auth',
+    			'django.contrib.contenttypes',
+    			'django.contrib.sessions',
+   			'django.contrib.messages',
+    			'django.contrib.staticfiles',
+
+   			'DnDApp',
+			'rest_framework',
+		]
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+5) Creacion de Vistas en nuestro proyecto
+
+ 5.0- Crea el archivo para vistas o usa si está views.py
+
+	5.1- Siguiendo el ejemplo , usa un nombre y el tipo predefinido que contenga la query y el json
+	
+		from django.shortcuts import render
+		from rest_framework import generics
+		from DnDApp import serializers
+
+		from DnDApp.models import Personajes
+
+
+		class PersonajesAPIView(generics.ListCreateAPIView): #Vista de todos los personajes
+    
+   			queryset=Personajes.objects.all()
+    			serializer_class= serializers.PersonajesSerializer#traduce un objeto a json
+
+
+		class PersonajeAPIView(generics.RetrieveUpdateDestroyAPIView): #Vista actualizar/eliminar
+
+	    		queryset=Personajes.objects.all()
+    			serializer_class= serializers.PersonajesSerializer#traduce un objeto a json
+	
+	5.2- Creamos el serializador.py para nuestra clase
+		from rest_framework import serializers
+
+		from DnDApp.models import Personajes
+
+
+		class PersonajesSerializer(serializers.ModelSerializer):
+
+    			class Meta:
+           			model=Personajes
+         			fields='__all__' #todos los campos
+
+
+ 	5.3- Añadimos las rutas de la siguiente forma
+ 	
+		from django.urls import path
+		from DnDApp import views
+
+		urlpatterns=[
+    			path('personajes/',views.PersonajesAPIView.as_view()),
+    			path('personaje/<int:pk>/',views.PersonajeAPIView.as_view()), (siendo pk un nombre aleatorio que representa primary key)
+
+		]
+		
+		5.3.2- Añadir esos paths al path principal url.py del proyecto grande.
+			
+			from django.contrib import admin
+			from django.urls import include, path
+
+			urlpatterns = [
+    				path('admin/', admin.site.urls),
+    				path('api/', include('DnDApp.urls')), (todas las urls de nuestra app vendran por la llamada api/ 
+			]
+	
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+6) Creacion del FrontEnd (REACT)
+
+ 6.1- Creacion Proyecto Front y su config ejecutando:
+	npm create vite@latest
+
+ 6.2- Abrir el Front con el comando:  (http://localhost:5173/)
+	npm run dev
+
+ 6.3- Instalamos Bootstrap
+ 	pip install Bootstrap
+
+ 6.4- Agregamos CORS , sirve para que permita comunicacion entre los puertos Back-Front
+	pip install django-cors-headers
+
+	6.4.1- Agregamos el Material en settings , tal y como nos indica la Pagina de Django:
+
+		INSTALLED_APPS = [ 		MIDDLEWARE = [					CORS_ALLOWED_ORIGINS = [
+		...				'corsheaders.middleware.CorsMiddleware',		'http://localhost:5173', (puerto del front)	
+		'corsheaders',			'django.middleware.common.CommonMiddleware',	]
+		]				]
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////

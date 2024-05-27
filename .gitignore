@@ -1,0 +1,8 @@
+# Ignorar el entorno virtual
+src/env/
+
+# Ignorar todos los directorios __pycache__
+**/__pycache__/
+
+# Ignorar la base de datos SQLite
+src/BackEnd/db.sqlite3
