@@ -1,24 +1,20 @@
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = 'django-insecure-0=ac7xxn=uswnz566l%j8*9y5c77#-e9*v_o42qa7^c-rhow!0'
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0vr7tjb3i1-tcfkt+&63ba9mljy=f7psad-o*2!_hud45*wy*d'
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [    
+    '213.194.141.204',
+    'localhost',
+    '192.168.1.137',
+    '192.168.56.1',
+    '172.28.240.1:5173',
+]
 
-
-# Application definition
-
-INSTALLED_APPS = [
+BASE_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -27,7 +23,23 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-MIDDLEWARE = [
+LOCAL_APPS =[
+    'Apps.default_note_app',
+] 
+
+THIRDS_APPS=[
+    'corsheaders', #Allow specific external domains to communicate with our API, particularly to enable Frontend-Backend communication across different addresses.
+    'rest_framework',
+
+]
+
+INSTALLED_APPS = BASE_APPS + LOCAL_APPS + THIRDS_APPS
+
+MIDDLEWARE = [    
+    #----------CorsHeaders----------
+    'corsheaders.middleware.CorsMiddleware',
+    #----------CorsHeaders----------
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -57,20 +69,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'CoreApp.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -87,11 +91,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.0/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-es'
 
 TIME_ZONE = 'UTC'
 
@@ -99,13 +99,17 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-
 STATIC_URL = 'static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Allows requests from all domains (for development)
+CORS_ALLOW_ALL_ORIGINS = True
+
+# For production, use a specific list of domains
+CORS_ALLOWED_ORIGINS = [
+#    "https://frontend-domain.com",
+#    'http://localhost:5173',	
+#    "https://another-domain.com",
+
+]

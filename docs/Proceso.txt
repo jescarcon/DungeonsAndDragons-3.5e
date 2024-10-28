@@ -2,13 +2,13 @@ Como iniciar un proyecto Django + React (https://www.youtube.com/watch?v=Fg0OZqL
 
 Comandos acceso rapido
 #######################################################################
-
+docker-compose up --build (Build docker)
 npm run dev 		    (FrontEnd)
 python manage.py runserver  (BackEnd)
 
 .\env\Scripts\activate (Iniciar Entorno Virtual)
 
-django-admin startapp nombre      (Crear Nuevas Apps en /apps)
+django-admin startapp nombre      (Crear Nuevas Apps en /apps) Importante Cambiar su ruta
 python manage.py startapp nombre  (Crear nuevas Apps)
 python manage.py makemigrations   (Actualiza Bases de Datos)
 python manage.py migrate   	  	  (Actualiza Bases de Datos)

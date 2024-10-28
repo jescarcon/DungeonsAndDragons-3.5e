@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./FrontEnd  # Asegúrate de que esta ruta sea correcta
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"  # Mapea el puerto del contenedor al host
+    depends_on:
+      - backend  # Asegura que el backend esté corriendo antes del frontend
+
+  backend:
+    build:
+      context: ./BackEnd  # Asegúrate de que esta ruta sea correcta
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"  # Mapea el puerto del contenedor al host
+    volumes:
+      - ./BackEnd:/app  # Monta el código fuente para desarrollo
+    environment:
+      - DEBUG=1  # Ajustes de entorno, por ejemplo, activar modo debug en Django

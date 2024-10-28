@@ -1,0 +1,206 @@
+/* ------------------------------
+   General Styles
+   ------------------------------ */
+
+   .note-page {
+    align-items: center; /* Center-align children */
+    user-select: none; /* Disable text selection */
+    padding: 20px; /* Space around the component */
+    display: flex; /* Flex layout */
+    flex-direction: column; /* Stack elements */
+  }
+  
+  /* ------------------------------
+     Notes Container
+     ------------------------------ */
+  
+  .notes-container {
+    gap: 15px; /* Space between notes */
+    justify-content: center; /* Center-align notes */
+    width: 100%; /* Full width */
+    display: flex; /* Flex layout */
+    flex-direction: row; /* Stack elements */
+    flex-wrap: wrap; /* Wrap notes to next line */
+    align-items: center; /* Center align vertically */
+  }
+  
+  /* ------------------------------
+     Note Card Styles
+     ------------------------------ */
+  
+  .note-card {
+    width: 20%; /* Width of each note */
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 15px; /* Padding inside note */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    background-color: #fafafa; /* Light background */
+    position: relative; /* Allows positioning of delete button */
+    min-width: 200px; /* Minimum width */
+  }
+  
+  /* ------------------------------
+     Note Card Textarea
+     ------------------------------ */
+  
+  .note-card textarea {
+    resize: vertical; /* Allow only vertical resizing */
+    overflow: auto; /* Show scrollbar if necessary */
+    min-height: 50px; /* Minimum height */
+    max-height: 200px; /* Maximum height */
+    padding: 10px; /* Inner padding */
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 4px; /* Rounded corners */
+    width: 100%; /* Full width */
+  }
+  
+  /* ------------------------------
+     Note Card Title
+     ------------------------------ */
+  
+  .note-card-title {
+    border-bottom: 1px solid #ccc; /* Underline */
+    padding-bottom: 5px; /* Space below title */
+    margin-bottom: 10px; /* Margin below title */
+    font-weight: bold; /* Bold text */
+    color: #333; /* Dark gray color */
+    justify-content: space-between; /* Space elements */
+    align-items: center; /* Center vertically */
+  }
+  
+  /* ------------------------------
+     Delete Button Styles
+     ------------------------------ */
+  
+  .delete-button {
+    background: none; /* No background */
+    border: none; /* No border */
+    color: #ff4d4d; /* Red color */
+    font-weight: bold; /* Bold text */
+    cursor: pointer; /* Pointer cursor */
+  }
+  
+  .delete-button:hover {
+    color: #ff0000; /* Darker red on hover */
+  }
+  
+  /* ------------------------------
+     New Note Form Styles
+     ------------------------------ */
+  
+  .new-note-form {
+    gap: 10px; /* Space between form elements */
+    width: 50%; /* Half width */
+    display: flex; /* Flex layout */
+    flex-direction: column; /* Stack elements */
+    margin-bottom: 20px; /* Space below form */
+  }
+  
+  .new-note-form input,
+  .new-note-form textarea {
+    padding: 10px; /* Inner padding */
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    resize: vertical; /* Allow vertical resizing */
+  }
+  
+  /* ------------------------------
+     New Note Form Button Styles
+     ------------------------------ */
+  
+  .new-note-form button {
+    padding: 10px; /* Button padding */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    cursor: pointer; /* Pointer cursor */
+  }
+  
+  .new-note-form button:hover {
+    background-color: #45a049; /* Darker green on hover */
+  }
+  
+  /* ------------------------------
+     Edit Button Styles
+     ------------------------------ */
+  
+  .edit-button {
+    background-color: #007bff; /* Blue background for edit */
+    color: white; /* White text for contrast */
+    padding: 5px 10px; /* Padding for button size */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Smooth border radius */
+    cursor: pointer; /* Pointer cursor */
+    font-weight: bold; /* Bold text */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+  }
+  
+  .edit-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+  
+  /* ------------------------------
+     Edit Note Form Styles
+     ------------------------------ */
+  
+  .edit-note-form {
+    display: flex; /* Use flex layout */
+    flex-direction: column; /* Stack elements vertically */
+    gap: 10px; /* Space between each field */
+    background-color: #f9f9f9; /* Light background */
+    padding: 10px; /* Inner padding for spacing */
+    border-radius: 5px; /* Slightly rounded corners */
+    border: 1px solid #ddd; /* Light border to separate visually */
+  }
+  
+  /* ------------------------------
+     Edit Note Form Input Styles
+     ------------------------------ */
+  
+  .edit-note-form input,
+  .edit-note-form textarea {
+    padding: 8px; /* Padding inside fields */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 4px; /* Smooth border radius */
+    font-size: 14px; /* Slightly smaller font size */
+    width: 95%; /* Almost full width */
+  }
+  
+  /* ------------------------------
+     Edit Note Form Button Styles
+     ------------------------------ */
+  
+  .edit-note-form button[type="submit"] {
+    background-color: #4CAF50; /* Green background for save */
+    color: white; /* White text for contrast */
+    padding: 8px; /* Padding for button size */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Smooth border radius */
+    cursor: pointer; /* Pointer cursor */
+    font-weight: bold; /* Bold text */
+  }
+  
+  .edit-note-form button[type="submit"]:hover {
+    background-color: #45a049; /* Darker green on hover */
+  }
+  
+  /* ------------------------------
+     Cancel Button Styles
+     ------------------------------ */
+  
+  .edit-note-form button[type="button"] {
+    background-color: #f44336; /* Red background for cancel */
+    color: white; /* White text for contrast */
+    padding: 8px; /* Padding for button size */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Smooth border radius */
+    cursor: pointer; /* Pointer cursor */
+    font-weight: bold; /* Bold text */
+    margin-top: 5px; /* Space above button */
+  }
+  
+  .edit-note-form button[type="button"]:hover {
+    background-color: #e03131; /* Darker red on hover */
+  }
+  
