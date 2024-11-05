@@ -1,0 +1,64 @@
+/* NotFound.css */
+.NotFoundPage-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 100vh;
+    color: #f3e5ab;
+    background: radial-gradient(circle at center, #1e212b, #0d0d0d);
+    font-family: 'Cinzel', serif;
+    padding: 20px;
+    overflow: hidden;
+    user-select: none;
+}
+
+.NotFoundPage-container.animate {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+}
+
+.NotFoundPage-container h1 {
+    font-size: 3rem;
+    color: #ff4f5a;
+    margin: 0;
+}
+
+.NotFoundPage-text {
+    font-size: 1.2rem;
+    margin: 10px 0;
+}
+
+.NotFoundPage-emoji {
+    font-size: 2.5rem;
+    margin: 15px 0;
+}
+
+.NotFoundPage-button {
+    background-color: #9d0208;
+    color: #f3e5ab;
+    border: 2px solid #f3e5ab;
+    padding: 10px 18px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+}
+
+.NotFoundPage-button:hover {
+    background-color: #6a040f;
+    transform: scale(1.1);
+}
+
+.NotFoundPage-button:focus {
+    outline: none;
+}
+

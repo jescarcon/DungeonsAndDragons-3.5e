@@ -1,0 +1,38 @@
+.InitialPage-container{
+    color: white;
+    margin: 0 auto;
+    width: 50%;
+    border: solid white 1px;
+    border-radius: 14px;
+    text-align: center;
+    margin-top: 2%;
+    user-select: none;
+    padding: 1px;
+}
+.titulo{
+    margin-top: 5%;
+    margin-bottom: 5%;
+
+}
+.txt-content{
+    margin-left: 10%;
+    margin-right: 10%;
+
+}
+.botonInicio{
+    background-color: rgb(36, 36, 36);
+    color: white;
+    border: solid white 1px;
+    padding: 15px;
+    font: inherit;
+}
+.botonInicio:hover{
+    background-color: rgb(73, 73, 73);
+
+}
+@media (max-width: 880px) {
+    .InitialPage-container{
+        width: 90%;
+    }
+}
+  

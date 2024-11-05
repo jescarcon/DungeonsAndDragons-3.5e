@@ -9,6 +9,7 @@ DEBUG = True
 ALLOWED_HOSTS = [    
     '213.194.141.204',
     'localhost',
+    '127.0.0.1',
     '192.168.1.137',
     '192.168.56.1',
     '172.28.240.1:5173',
@@ -24,12 +25,13 @@ BASE_APPS = [
 ]
 
 LOCAL_APPS =[
-    'Apps.default_note_app',
+    'Apps.User.AuthApp',
 ] 
 
 THIRDS_APPS=[
     'corsheaders', #Allow specific external domains to communicate with our API, particularly to enable Frontend-Backend communication across different addresses.
     'rest_framework',
+    'rest_framework_simplejwt', #JWT
 
 ]
 
@@ -113,3 +115,23 @@ CORS_ALLOWED_ORIGINS = [
 #    "https://another-domain.com",
 
 ]
+
+#------------------JWT------------------#
+
+from datetime import timedelta
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
+#------------------JWT------------------#
