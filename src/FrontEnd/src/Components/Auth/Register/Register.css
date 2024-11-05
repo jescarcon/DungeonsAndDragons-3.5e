@@ -1,0 +1,18 @@
+.RegisterPage-Container {
+   color: white;
+   margin: 0 auto;
+   width: 50%;
+   border: solid white 1px;
+   border-radius: 14px;
+   text-align: center;
+   margin-top: 4%;
+   margin-bottom: 4%;
+   user-select: none;
+   padding: 20px;
+   margin-bottom: 10%;
+}
+@media (max-width: 1920px) {
+   .RegisterPage-container{
+       width: 50%;
+   }
+}
