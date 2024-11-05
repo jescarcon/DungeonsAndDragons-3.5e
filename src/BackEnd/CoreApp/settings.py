@@ -1,4 +1,6 @@
 from pathlib import Path
+from corsheaders.defaults import default_headers #CorsHeaders
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,11 +27,11 @@ BASE_APPS = [
 ]
 
 LOCAL_APPS =[
-    'Apps.User.AuthApp',
+    'Apps.User.AuthApp','Apps.Rolplay.GameApp'
 ] 
 
 THIRDS_APPS=[
-    'corsheaders', #Allow specific external domains to communicate with our API, particularly to enable Frontend-Backend communication across different addresses.
+    'corsheaders', #CorsHeaders Allow specific external domains to communicate with our API, particularly to enable Frontend-Backend communication across different addresses.
     'rest_framework',
     'rest_framework_simplejwt', #JWT
 
@@ -105,6 +107,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#------------------CorsHeaders------------------#
+
 # Allows requests from all domains (for development)
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -115,6 +119,10 @@ CORS_ALLOWED_ORIGINS = [
 #    "https://another-domain.com",
 
 ]
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'username',
+]
+#------------------CorsHeaders------------------#
 
 #------------------JWT------------------#
 
