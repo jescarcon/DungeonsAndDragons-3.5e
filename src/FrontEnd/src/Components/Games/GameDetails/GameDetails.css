@@ -1,0 +1,108 @@
+/* Contenedor principal */
+.GameDetails-Container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 80vh;
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    padding: 20px;
+  }
+  
+  /* Título principal */
+  .GameDetails-Title h1 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    user-select: none;
+  }
+  
+  .diary-header {
+    display: flex;
+    justify-content: center;
+    color: white;
+
+  }
+  
+  .diary-add-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  
+  .diary-add-button img {
+    width: 30px;
+    height: 30px;
+  }
+
+
+  /* Contenedor de opciones de detalles del juego */
+  .GameDetails-Options {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 1200px;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  /* Enlace para cada opción de detalles del juego */
+  .GameDetails-Link {
+    text-decoration: none;
+    color: #ffffff;
+    width: 30%;
+  }
+  
+  /* Estilo de la tarjeta que contiene la imagen y el texto */
+  .GameDetails-Card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+    
+  }
+  
+  /* Efecto hover para las tarjetas */
+  .GameDetails-Card:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Imagen dentro de cada tarjeta */
+  .GameDetails-Image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    border-radius: 15px;
+    
+  }
+  
+  /* Texto superpuesto centrado sobre la imagen */
+  .GameDetails-Text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffffff;
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+    user-select: none;
+  }
+  
+  /* Responsividad para pantallas pequeñas */
+  @media (max-width: 768px) {
+    .GameDetails-Link {
+      width: 100%;
+    }
+    
+    .GameDetails-Image {
+      height: 200px;
+    }
+  
+    .GameDetails-Text {
+      font-size: 1.5rem;
+    }
+  }
+  
