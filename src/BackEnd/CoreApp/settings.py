@@ -1,10 +1,17 @@
 from pathlib import Path
+from corsheaders.defaults import default_headers #CorsHeaders
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-0=ac7xxn=uswnz566l%j8*9y5c77#-e9*v_o42qa7^c-rhow!0'
 
 DEBUG = True
+
+#---MEDIA URL CONFIG---
+MEDIA_URL = '/media/'  
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
+#---MEDIA URL CONFIG---
 
 ALLOWED_HOSTS = [    
     '213.194.141.204',
@@ -25,11 +32,11 @@ BASE_APPS = [
 ]
 
 LOCAL_APPS =[
-    'Apps.User.AuthApp',
+    'Apps.User.AuthApp','Apps.Rolplay.GameApp'
 ] 
 
 THIRDS_APPS=[
-    'corsheaders', #Allow specific external domains to communicate with our API, particularly to enable Frontend-Backend communication across different addresses.
+    'corsheaders', #CorsHeaders Allow specific external domains to communicate with our API, particularly to enable Frontend-Backend communication across different addresses.
     'rest_framework',
     'rest_framework_simplejwt', #JWT
 
@@ -105,6 +112,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#------------------CorsHeaders------------------#
+
 # Allows requests from all domains (for development)
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -115,6 +124,10 @@ CORS_ALLOWED_ORIGINS = [
 #    "https://another-domain.com",
 
 ]
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'username',
+]
+#------------------CorsHeaders------------------#
 
 #------------------JWT------------------#
 
@@ -124,6 +137,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",

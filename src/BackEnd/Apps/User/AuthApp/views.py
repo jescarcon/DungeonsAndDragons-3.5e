@@ -19,7 +19,7 @@ class ListUserView(generics.ListAPIView): #Get user list
 class UserByUsernameDetailView(generics.RetrieveAPIView): #Get user by Username
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     
     def get_object(self):
         username = self.kwargs.get("username")
@@ -28,7 +28,7 @@ class UserByUsernameDetailView(generics.RetrieveAPIView): #Get user by Username
 class UserByIDDetailView(generics.RetrieveAPIView): #Get user by ID
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_object(self):
         pk = self.kwargs.get("pk")

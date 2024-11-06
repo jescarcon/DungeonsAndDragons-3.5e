@@ -10,6 +10,14 @@ import Login from './Components/Auth/Login/Login';
 import Register from './Components/Auth/Register/Register';
 import ProtectedRoute from './Components/Auth/ProtectedRoute';
 import Navbar from './Components/Main/Navbar/Navbar';
+
+import GameList from './Components/Games/GameList/GameList';
+import GameDetails from './Components/Games/GameDetails/GameDetails';
+import Diary from './Components/Games/GameDetails/Diary/Diary';
+import DiaryEntry from './Components/Games/GameDetails/Diary/Entries/DiaryEntry';
+import Notes from './Components/Games/GameDetails/Notes/Notes';
+import Tavern from './Components/Games/GameDetails/Tavern/Tavern';
+
 //#endregion
 
 //#region Logica
@@ -47,6 +55,15 @@ function App() {
         {/* Protected with Login Routes*/}
         <Route element={<ProtectedLayout />}>
           <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+        
+
+          <Route path="/games" element={<ProtectedRoute><GameList/></ProtectedRoute>} />
+          <Route path="/games/:pk" element={<ProtectedRoute><GameDetails/></ProtectedRoute>} />
+          <Route path="/games/:pk/diary" element={<ProtectedRoute><Diary/></ProtectedRoute>} />
+          <Route path="/games/:pk/diaries/:id/entries" element={<ProtectedRoute><DiaryEntry/></ProtectedRoute>} />
+          <Route path="/games/:pk/tavern" element={<ProtectedRoute><Tavern/></ProtectedRoute>} />
+          <Route path="/games/:pk/notes" element={<ProtectedRoute><Notes/></ProtectedRoute>} />
+
         </Route>
 
 

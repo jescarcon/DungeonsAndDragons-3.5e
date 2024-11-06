@@ -1,0 +1,88 @@
+.diary-container {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .diary-title h1 {
+    color: white;
+  }
+  
+  .diary-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .diary-item {
+    position: relative;
+    width: 200px;
+    height: 300px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border-radius: 10px;
+  }
+  
+  .diary-item:hover {
+    transform: scale(1.05);
+  }
+  
+  .diary-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  
+  .diary-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.89);
+    color: white;
+    padding: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 0 0 10px 10px;
+  }
+  
+  .diary-item:hover .diary-overlay {
+    opacity: 1;
+  }
+  
+  .diary-name {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    pointer-events: none;
+    user-select: none;
+  }
+  
+  .diary-description {
+    font-size: 14px;
+    margin-top: 10px;  
+  }
+  
+  .diary-title {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .add-diary-button {
+    background: none; /* Quita el fondo del botón */
+    cursor: pointer; /* Cambia el cursor para indicar que es un botón clickeable */
+  }
+ 
+  .modal-form label{
+    text-align: left;
+  }
+  .context-menu button{
+    font-weight: bold;
+  }

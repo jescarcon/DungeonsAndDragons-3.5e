@@ -1,0 +1,305 @@
+/* General container */
+.game-list-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 90%;
+    border-radius: 10px;
+  }
+  
+  /* Title styling */
+  .game-list-title h1 {
+    text-align: center;
+    color: white;
+    user-select: none;
+    font-size: 3rem;
+    
+  }
+  
+
+  .game-header {
+    display: flex;
+    justify-content: center;
+    color: white;
+
+  }
+  
+  .game-add-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  
+  .game-add-button img {
+    width: 30px;
+    height: 30px;
+  }
+  
+  
+
+
+  /* Options container */
+  .game-list-options {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .noGameList{
+    color:white;
+    user-select: none;
+  }
+  /* Link for each game card */
+  .game-link {
+    text-decoration: none;
+    color: inherit;
+    width: 30%;
+    transition: transform 0.3s ease-in-out;
+
+  }
+  .game-link:hover{
+    transform: scale(1.05);
+
+  }
+  /* Card containing image and text */
+  .game-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+ 
+  /* Image styles */
+  .game-card-image {
+    position: relative;
+    height: 500px;
+    background-color: #ccc;
+    overflow: hidden; /* Asegura que la imagen no sobresalga del contenedor redondeado */
+    border-radius: 15px; /* Redondea las esquinas del contenedor */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+  }
+  .game-card-image:hover {
+    transform: scale(1.05);
+  }
+  .game-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    
+  }
+  
+  /* Placeholder for missing images */
+  .game-card-placeholder {
+    height: 100%;
+    background-color: #ccc;
+  }
+ 
+  
+  /* Title overlay */
+  .game-card-title {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+    user-select: none;
+
+  }
+  
+  .game-list-title {
+    display: flex;
+    justify-content: center;
+    
+    
+  }
+  
+  .add-button {
+    background: none;
+    cursor: pointer;
+    
+    user-select: none;
+  }
+   
+
+  /* Modal overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Modal container */
+  .modal {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 500px;
+    width: 100%;
+    position: relative;
+    max-height: 80vh; /* Altura máxima del modal */
+    overflow-y: auto; /* Agregar barra de desplazamiento vertical si es necesario */
+  }
+  
+  /* Close button */
+  .modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  
+  /* Form styling */
+  .modal-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modal-form label {
+    margin-bottom: 10px;
+    font-weight: bold;
+
+  }
+  
+    .modal-form input,
+    .modal-form textarea {
+    width: calc(100% - 16px); /* Ajusta el tamaño para dejar un pequeño margen */
+    padding: 6px; /* Reducir padding */
+    margin-top: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    resize: none;
+    }
+  
+  .image-preview {
+    margin-top: 10px;
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .modal-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .modal-buttons button[type="submit"] {
+    background-color: #000000;
+    color: white;
+  }
+  
+  .modal-buttons button[type="button"] {
+    background-color: #d34f4f;
+    color: white;
+  }
+/* Estilos para el menú contextual */
+.context-menu {
+    position: fixed; /* Cambiado de absolute a fixed */
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    min-width: 150px;
+    padding: 8px 0;
+    /* Para ajustar el menú si está cerca del borde */
+    transform: translate(calc(-50% + 8px), 0); /* Alineación horizontal */
+  }
+  
+  .context-menu button {
+    display: block;
+    width: 90%; /* Aseguramos que el botón ocupa el ancho completo del menú */
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    padding: 8px 16px; /* Espaciado interno del botón */
+  }
+  
+  .context-menu button:hover {
+    background: #f0f0f0;
+  }
+  
+  /* Ajuste para evitar que el menú se corte en los bordes de la ventana */
+  .context-menu {
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  
+  
+  .context-menu button:hover {
+    background: #f0f0f0;
+  }
+  
+  
+  .image-preview {
+    max-width: 100px;
+  }
+  
+  .buttonDeleteImg {
+    background-color: #000000;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .buttonDeleteImg:hover {
+    background-color: rgb(100, 100, 100);
+  }
+  /* Tooltip styling */
+.game-card-tooltip {
+    display: none;
+    position: absolute;
+    bottom: -1%; /* Position above the card */
+    background-color: rgba(0, 0, 0, 0.856);
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    pointer-events: none; /* Avoid blocking card interaction */
+  }
+  
+  .game-card:hover .game-card-tooltip {
+    display: block;
+  }
+  
+  /* Responsive styling */
+  @media (max-width: 768px) {
+    .game-link {
+      width: 100%;
+    }
+  
+    .game-card-image {
+      height: 200px;
+    }
+  
+    .game-card-title {
+      font-size: 1.2rem;
+    }
+  }
+  

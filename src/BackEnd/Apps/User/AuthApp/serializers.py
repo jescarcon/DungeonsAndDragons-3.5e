@@ -11,18 +11,21 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None) #Deletes original password for security reasons 
+        # Extract the password from validated_data, removing it from the dictionary.
+        # If no password is provided, default to None.
+        password = validated_data.pop('password', None)
 
+        # Check if the password is provided, raise an error if it’s empty
         if not password:
             raise serializers.ValidationError({"password": "Password cannot be empty."})
 
-        # Crear el usuario sin la contraseña
+        # Create the user without the password (since it can't be stored as plain text)
         user = User(**validated_data)
         
-        # Usar set_password() para cifrar la contraseña
+        # If a password was provided, encrypt it using set_password()
         user.set_password(password)
         
-        # Guardar el usuario en la base de datos
+        # Save the user in the database
         user.save()
         
         return user
