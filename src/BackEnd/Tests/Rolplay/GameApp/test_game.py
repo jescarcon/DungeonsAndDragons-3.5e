@@ -3,7 +3,7 @@ from rest_framework import status
 from django.urls import reverse
 from rest_framework.test import APIClient
 from django.contrib.auth import get_user_model
-from Apps.Rolplay.GameApp.models import Game, Note, Diary, DiaryEntry
+from Apps.Rolplay.GameApp.models import Game
 
 
 User = get_user_model()

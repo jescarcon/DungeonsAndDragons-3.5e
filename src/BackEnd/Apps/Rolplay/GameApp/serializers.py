@@ -5,26 +5,26 @@ from .models import Game, Note, Diary, DiaryEntry, Image
 class DiaryEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = DiaryEntry
-        fields = ['id', 'name', 'description']
+        fields = ['id', 'name', 'description','diary']
 
 #---------------------DIARY SERIALIZER---------------------
 class DiarySerializer(serializers.ModelSerializer):
-    entries = DiaryEntrySerializer(many=True, read_only=True)  # Anidar las entradas del diario
+    entries = DiaryEntrySerializer(many=True, read_only=True) 
 
     class Meta:
         model = Diary
-        fields = ['id', 'name', 'description', 'entries']
+        fields = ['id', 'name', 'description', 'entries','game']
 
 #---------------------NOTE SERIALIZER---------------------
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ['id', 'name', 'description', 'type']
+        fields = ['id', 'name', 'description', 'type','game']
 
 #---------------------GAME SERIALIZER---------------------
 class GameSerializer(serializers.ModelSerializer):
-    notes = NoteSerializer(many=True, read_only=True)  # Anidar las notas del juego
-    diaries = DiarySerializer(many=True, read_only=True)  # Anidar los diarios y sus entradas
+    notes = NoteSerializer(many=True, read_only=True)  
+    diaries = DiarySerializer(many=True, read_only=True)  
 
     class Meta:
         model = Game
@@ -34,4 +34,4 @@ class GameSerializer(serializers.ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ['id', 'image', 'diary_entry', 'note']
+        fields = ['id', 'image','game','diary' ,'diary_entry', 'note']
