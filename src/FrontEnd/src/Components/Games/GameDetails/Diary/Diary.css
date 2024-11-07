@@ -1,6 +1,8 @@
 .diary-container {
     padding: 20px;
     text-align: center;
+    user-select: none;
+
   }
   
   .diary-title h1 {
@@ -85,4 +87,7 @@
   }
   .context-menu button{
     font-weight: bold;
+  }
+  .diary-add-button{
+    margin-left: 2%;
   }

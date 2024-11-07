@@ -21,6 +21,7 @@
     display: flex;
     justify-content: center;
     color: white;
+    user-select: none;
 
   }
   
@@ -29,6 +30,7 @@
     border: none;
     cursor: pointer;
     padding: 0;
+    margin-left: 2%;
   }
   
   .game-add-button img {
@@ -209,9 +211,15 @@
     background-color: #000000;
     color: white;
   }
-  
+  .modal-buttons button[type="submit"]:hover{
+    background-color: #292929;
+  }
   .modal-buttons button[type="button"] {
     background-color: #d34f4f;
+    color: white;
+  }
+  .modal-buttons button[type="button"]:hover {
+    background-color: #e45656;
     color: white;
   }
 /* Estilos para el menú contextual */
@@ -266,6 +274,7 @@
     color: white;
     border: none;
     padding: 5px 10px;
+    margin-left: 2%;
     cursor: pointer;
   }
   

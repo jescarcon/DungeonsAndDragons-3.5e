@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { BASE_API_URL } from '../../../constants';
-import Diario from '/Character/Diary/Diarios.jpg';
 import Añadir from '/Common/añadir_blanco.png';
 import './Diary.css';
 
 export default function Diary() {
+  //#region States
   const [diaries, setDiaries] = useState([]);
   const [gameName, setGameName] = useState('');
   const [loading, setLoading] = useState(true);
@@ -15,21 +15,44 @@ export default function Diary() {
   const [editDiary, setEditDiary] = useState(null); // Estado para el diario en edición
   const [showEditModal, setShowEditModal] = useState(false); // Estado para manejar el modal de edición
   const { pk } = useParams();
+  //#endregion
+
+  //#region Logic
 
   useEffect(() => {
     const fetchGameName = async () => {
+      const token = localStorage.getItem('access');
       try {
-        const response = await fetch(`${BASE_API_URL}/api/characterApp/games/${pk}/`);
+        const response = await fetch(`${BASE_API_URL}/api/gameApp/games/${pk}/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`, 
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
         const gameData = await response.json();
         setGameName(gameData.name);
       } catch (error) {
         console.error('Error fetching game name:', error);
       }
     };
+    
 
     const fetchDiaries = async () => {
+      const token = localStorage.getItem('access');
+
       try {
-        const response = await fetch(`${BASE_API_URL}/api/characterApp/diaries/`);
+        const response = await fetch(`${BASE_API_URL}/api/gameApp/diaries/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,  // Reemplaza `token` con el valor adecuado
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
         const data = await response.json();
         const filteredDiaries = data.filter(diary => diary.game === parseInt(pk));
         setDiaries(filteredDiaries);
@@ -39,6 +62,7 @@ export default function Diary() {
         setLoading(false);
       }
     };
+    
 
     fetchGameName();
     fetchDiaries();
@@ -62,9 +86,16 @@ export default function Diary() {
   };
 
   const handleDelete = async (diaryId) => {
+    const token = localStorage.getItem('access');
+
     try {
-      const response = await fetch(`${BASE_API_URL}/api/characterApp/diaries/${diaryId}/`, {
-        method: 'DELETE'
+      const response = await fetch(`${BASE_API_URL}/api/gameApp/diaries/${diaryId}/`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,  
+        },
+
       });
 
       if (!response.ok) {
@@ -80,19 +111,22 @@ export default function Diary() {
   };
 
   const handleCreateDiary = async () => {
+    const token = localStorage.getItem('access');
+
     try {
-      const response = await fetch(`${BASE_API_URL}/api/characterApp/diaries/`, {
+      const response = await fetch(`${BASE_API_URL}/api/gameApp/diaries/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,  
         },
         body: JSON.stringify({ ...newDiary, game: pk }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Error al crear el diario');
       }
-
+  
       const createdDiary = await response.json();
       setDiaries((prevState) => [...prevState, createdDiary]);
     } catch (error) {
@@ -102,13 +136,18 @@ export default function Diary() {
       setNewDiary({ name: '', description: '' });
     }
   };
+  
 
   const handleEditDiary = async () => {
+    const token = localStorage.getItem('access');
+
     try {
-      const response = await fetch(`${BASE_API_URL}/api/characterApp/diaries/${editDiary.id}/`, {
+      const response = await fetch(`${BASE_API_URL}/api/gameApp/diaries/${editDiary.id}/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,  
+
         },
         body: JSON.stringify(editDiary),
       });
@@ -130,13 +169,14 @@ export default function Diary() {
   };
 
   if (loading) return <div>Loading...</div>;
+  //#endregion
 
   return (
     <div className='diary-container'>
       <div className="diary-header">
-      <h1>Diarios de {gameName}</h1>
-      <button className='diary-add-button' onClick={() => setShowModal(true)} title="Añadir un diario">
-          <img src={Añadir} alt="Añadir" className="add-icon" />
+        <h1>Diarios de {gameName}</h1>
+        <button className='diary-add-button' onClick={() => setShowModal(true)} title="Añadir un diario">
+            <img src={Añadir} alt="Añadir" className="add-icon" />
         </button>
       </div>
 
@@ -148,7 +188,7 @@ export default function Diary() {
           onContextMenu={(e) => handleContextMenu(e, diary)} // Add context menu handler here
         >
           <Link to={`/games/${pk}/diaries/${diary.id}/entries`}>
-            <img src={Diario} alt="Diario" className='diary-image' />
+            <img src={diary.image} alt="Diario" className='diary-image' />
             <div className='diary-name'>{diary.name}</div>
             <div className='diary-overlay'>
               <div className='diary-description'>{diary.description}</div>
@@ -198,6 +238,7 @@ export default function Diary() {
                   onChange={(e) => setNewDiary({ ...newDiary, description: e.target.value })}
                 />
               </label>
+              
               <div className="modal-buttons">
                 <button type="submit">Crear</button>
                 <button type="button" onClick={() => setShowModal(false)}>Cancelar</button>

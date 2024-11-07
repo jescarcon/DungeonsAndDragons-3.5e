@@ -13,7 +13,7 @@ class DiarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Diary
-        fields = ['id', 'name', 'description', 'entries','game']
+        fields = ['id', 'name', 'description', 'entries','game','image']
 
 #---------------------NOTE SERIALIZER---------------------
 class NoteSerializer(serializers.ModelSerializer):
