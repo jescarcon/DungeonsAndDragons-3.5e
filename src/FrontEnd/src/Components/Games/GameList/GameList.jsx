@@ -5,7 +5,7 @@ import Añadir from '/Common/añadir_blanco.png';
 import './GameList.css';
 
 export default function GameList() {
-//#region States
+  //#region States
 
   const [userId, setUserId] = useState(null);
   const [gameLists, setGameLists] = useState([]);
@@ -20,9 +20,9 @@ export default function GameList() {
     image: ''
   });
   const [editingGame, setEditingGame] = useState(null); // Partida que está siendo editada
-//#endregion
+  //#endregion
 
-//#region GameList
+  //#region GameList
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -83,9 +83,9 @@ export default function GameList() {
 
     fetchUserId();
   }, []);
-//#endregion 
+  //#endregion 
 
-//#region Modal Logic
+  //#region Modal Logic
   useEffect(() => {
     const handleClick = () => {
       setContextMenu(null);
@@ -108,14 +108,14 @@ export default function GameList() {
   };
 
   const handleEdit = (game) => {
-    setEditingGame({ 
-      ...game, 
+    setEditingGame({
+      ...game,
       imagePreview: constructImageUrl(game.image) // Carga la imagen actual para previsualizar
     });
     setIsEditModalOpen(true);
     setContextMenu(null);
   };
-  
+
 
   const handleDelete = async (gameId) => {
     const token = localStorage.getItem('access');
@@ -178,15 +178,15 @@ export default function GameList() {
   const handleEditImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setEditingGame(prevState => ({ 
-        ...prevState, 
+      setEditingGame(prevState => ({
+        ...prevState,
         image: file, // Asigna el archivo de imagen
         imagePreview: URL.createObjectURL(file) // Actualiza la previsualización con la nueva imagen
       }));
     }
   };
-  
-  
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('access');
@@ -225,13 +225,13 @@ export default function GameList() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('access');
-  
+
     try {
       const formData = new FormData();
       formData.append('name', editingGame.name);
       formData.append('description', editingGame.description);
       formData.append('user', userId);
-  
+
       // Si la image es null, significa que el usuario ha decidido eliminarla
       if (editingGame.image === null) {
         formData.append('image', '');
@@ -239,7 +239,7 @@ export default function GameList() {
         // Si hay una nueva image seleccionada, agregarla
         formData.append('image', editingGame.image, editingGame.image.name);
       }
-  
+
       const response = await fetch(`${BASE_API_URL}/api/gameApp/games/${editingGame.id}/`, {
         method: 'PUT',
         headers: {
@@ -247,13 +247,13 @@ export default function GameList() {
         },
         body: formData
       });
-  
+
       if (!response.ok) {
         throw new Error('Error al actualizar la partida');
       }
-  
+
       const data = await response.json();
-  
+
       // Actualiza la lista de partidas con los datos actualizados
       setGameLists(prevState => prevState.map(game => game.id === data.id ? data : game));
       handleCloseEditModal();
@@ -262,7 +262,7 @@ export default function GameList() {
       setError('Fallo al actualizar la partida');
     }
   };
-  
+
   if (loading) {
     return <div>Cargando...</div>;
   }
@@ -273,10 +273,10 @@ export default function GameList() {
 
   const constructImageUrl = (imagePath) => {
     if (!imagePath) return null;
-    
+
     return imagePath;
   };
-//#endregion
+  //#endregion
 
   return (
     <div className="game-list-container">
@@ -286,143 +286,163 @@ export default function GameList() {
           <img src={Añadir} alt="Añadir" className="add-icon" />
         </button>
       </div>
-        <div className="game-list-options">
+      <div className="game-list-options">
         {gameLists.length > 0 ? (
-            gameLists.map(game => (
+          gameLists.map(game => (
             <div key={game.id} className="game-link" onContextMenu={(e) => handleContextMenu(e, game)}>
-                <Link to={`/games/${game.id}`} className="game-card">
+              <Link to={`/games/${game.id}`} className="game-card">
                 <div className="game-card-image">
-                    {game.image ? (
+                  {game.image ? (
                     <img src={constructImageUrl(game.image)} alt="Fallo al cargar la imagen" />
-                    ) : (
+                  ) : (
                     <div className="game-card-placeholder"></div>
-                    )}
-                    <div className="game-card-tooltip">{game.description}</div>
+                  )}
+                  <div className="game-card-tooltip">{game.description}</div>
                 </div>
                 <div className="game-card-title">{game.name}</div>
-                </Link>
+              </Link>
             </div>
-            ))
+          ))
         ) : (
-            <p className='noGameList'>Aún no tienes ninguna partida.</p>
+          <p className='noGameList'>Aún no tienes ninguna partida. ¡Empieza creando una!</p>
         )}
-        </div>
+      </div>
 
-        {isModalOpen && (
+      {isModalOpen && (
         <div className="modal-overlay">
-            <div className="modal">
+          <div className="modal">
             <button className="modal-close" onClick={handleCloseModal}>×</button>
             <h2>Crear Nueva Partida</h2>
             <form onSubmit={handleSubmit} className="modal-form">
-                <label>
+              <label>
                 Nombre:
                 <input
-                    type="text"
-                    name="name"
-                    value={newGame.name}
-                    onChange={handleInputChange}
-                    required
-                    maxLength="30"
+                  type="text"
+                  name="name"
+                  value={newGame.name}
+                  onChange={handleInputChange}
+                  required
+                  maxLength="30"
+                  placeholder='La Sholen Yan'
                 />
-                </label>
-                <label>
+              </label>
+              <label>
                 Descripción:
                 <textarea
-                    name="description"
-                    value={newGame.description}
-                    onChange={handleInputChange}
-                    maxLength="60"
-
+                  name="description"
+                  value={newGame.description}
+                  onChange={handleInputChange}
+                  maxLength="60"
+                  placeholder='La historia de 8 bravos guerreros que salvaron el mundo.'
                 />
-                </label>
-                <label>
+              </label>
+              <label>
                 Imagen:
                 <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
+                  type="file"
+                  accept="image/*"
+                  title=""
+                  onChange={handleImageChange}
                 />
                 {newGame.imagePreview && (
+                  <div>
                     <img src={newGame.imagePreview} alt="Vista previa" className="image-preview" />
+                    <button className='buttonDeleteImg'
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault(); // Previene el comportamiento predeterminado del botón
+                        setNewGame(prevState => ({ ...prevState, image: null, imagePreview: null }));
+                      }}
+                    >
+                      X
+                    </button>
+                  </div>
                 )}
-                </label>
-                <div className="modal-buttons">
+              </label>
+              <div className="modal-buttons">
                 <button type="submit">Crear</button>
                 <button type="button" onClick={handleCloseModal}>Cancelar</button>
-                </div>
+              </div>
             </form>
-            </div>
+          </div>
         </div>
-        )}
+      )}
 
-        {isEditModalOpen && editingGame && (
+      {isEditModalOpen && editingGame && (
         <div className="modal-overlay">
-            <div className="modal">
+          <div className="modal">
             <button className="modal-close" onClick={handleCloseEditModal}>×</button>
             <h2>Editar Partida</h2>
             <form onSubmit={handleEditSubmit} className="modal-form">
-                <label>
+              <label>
                 Nombre:
                 <input
-                    type="text"
-                    name="name"
-                    value={editingGame.name}
-                    onChange={handleEditChange}
-                    required
-                    maxLength="30"
+                  type="text"
+                  name="name"
+                  value={editingGame.name}
+                  onChange={handleEditChange}
+                  required
+                  maxLength="30"
+                  placeholder='La Sholen Yan'                
                 />
-                </label>
-                <label>
+              </label>
+              <label>
                 Descripción:
                 <textarea
-                    name="description"
-                    value={editingGame.description}
-                    onChange={handleEditChange}
-                    required
-                    maxLength="60"
+                  name="description"
+                  value={editingGame.description}
+                  onChange={handleEditChange}
+                  required
+                  maxLength="60"
+                  placeholder='La historia de 8 bravos guerreros que salvaron el mundo.'
+                
                 />
-                </label>
-                <label>
+              </label>
+              <label>
                 Imagen:
                 <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleEditImageChange}
+                  title=""
+                  type="file"
+                  accept="image/*"
+                  onChange={handleEditImageChange}
                 />
                 {editingGame.imagePreview && (
-                    <div>
+                  <div>
                     <img src={editingGame.imagePreview} alt="Vista previa" className="image-preview" />
                     <button className='buttonDeleteImg'
-                        type="button" 
-                        onClick={(e) => {
-                            e.preventDefault(); // Previene el comportamiento predeterminado del botón
-                            setEditingGame(prevState => ({ ...prevState, image: null, imagePreview: null }));
-                        }}
-                        >
-                        X
-                        </button>
-                    </div>
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault(); // Previene el comportamiento predeterminado del botón
+                        setEditingGame(prevState => ({ ...prevState, image: null, imagePreview: null }));
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = null; // Restablece el valor del input de archivo
+                        }
+                      }}
+                    >
+                      X
+                    </button>
+                  </div>
                 )}
-                </label>
-                <div className="modal-buttons">
+              </label>
+              <div className="modal-buttons">
                 <button type="submit">Actualizar</button>
                 <button type="button" onClick={handleCloseEditModal}>Cancelar</button>
-                </div>
+              </div>
             </form>
-            </div>
+          </div>
         </div>
-        )}
+      )}
 
 
-        {contextMenu && (
-        <div 
-            className="context-menu" 
-            style={{ top: contextMenu.y, left: contextMenu.x }}
+      {contextMenu && (
+        <div
+          className="context-menu"
+          style={{ top: contextMenu.y, left: contextMenu.x }}
         >
-            <button onClick={() => handleEdit(contextMenu.game)}>Editar</button>
-            <button onClick={() => handleDelete(contextMenu.game.id)}>Eliminar</button>
+          <button onClick={() => handleEdit(contextMenu.game)}>Editar</button>
+          <button onClick={() => handleDelete(contextMenu.game.id)}>Eliminar</button>
         </div>
-        )}
+      )}
     </div>
   );
 }

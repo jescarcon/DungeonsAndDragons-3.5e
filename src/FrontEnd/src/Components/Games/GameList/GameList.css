@@ -80,7 +80,6 @@
     background-color: #ccc;
     overflow: hidden; /* Asegura que la imagen no sobresalga del contenedor redondeado */
     border-radius: 15px; /* Redondea las esquinas del contenedor */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease-in-out;
   }
   .game-card-image:hover {
@@ -154,7 +153,9 @@
     max-height: 80vh; /* Altura máxima del modal */
     overflow-y: auto; /* Agregar barra de desplazamiento vertical si es necesario */
   }
-  
+  .modal h2{
+    user-select: none;
+  }
   /* Close button */
   .modal-close {
     position: absolute;
@@ -175,7 +176,7 @@
   .modal-form label {
     margin-bottom: 10px;
     font-weight: bold;
-
+    user-select: none;
   }
   
     .modal-form input,
@@ -187,7 +188,23 @@
     border: 1px solid #ccc;
     resize: none;
     }
-  
+    .modal-form input[type="file"]{
+      width: 30%;
+      margin-left: 3%;
+    }
+    .modal-form input[type="file"]::file-selector-button {
+      color: #ffffff; /* Cambia el color del texto */
+      border: 1px solid #434343; /* Cambia el borde */
+      background-color: #000000d5;
+      padding: 8px 16px;
+      border-radius: 5px;
+      width: 100%;
+      cursor: pointer;
+    }
+    .modal-form input[type="file"]::file-selector-button:hover{
+      background-color: #000000b0;
+    }
+
   .image-preview {
     margin-top: 10px;
     max-width: 100%;
@@ -198,6 +215,7 @@
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
+    user-select: none;
   }
   
   .modal-buttons button {
@@ -238,7 +256,7 @@
   
   .context-menu button {
     display: block;
-    width: 90%; /* Aseguramos que el botón ocupa el ancho completo del menú */
+    width: 100%; /* Aseguramos que el botón ocupa el ancho completo del menú */
     border: none;
     background: none;
     text-align: left;
@@ -247,6 +265,7 @@
     font-weight: bold;
     color: #333;
     padding: 8px 16px; /* Espaciado interno del botón */
+    
   }
   
   .context-menu button:hover {
@@ -268,7 +287,8 @@
   .image-preview {
     max-width: 100px;
   }
-  
+  input[type="file"] { color: transparent; }
+
   .buttonDeleteImg {
     background-color: #000000;
     color: white;
