@@ -73,19 +73,5 @@ class DiaryEntry(models.Model):
     description = models.CharField(max_length=500, blank=True, null=True)
     diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name='entries')  # Diary Relation
 
-#---------------------IMAGES OF DIARY/NOTES---------------------
-def get_image_upload_path(instance, filename):
-    if instance.diary_entry:
-        # Si es para una entrada de diario
-        return os.path.join('images/rolplay/games_app/diary_entries/', filename)
-    elif instance.note:
-        # Si es para una nota
-        return os.path.join('images/rolplay/games_app/notes/', filename)
-    raise ValueError("The image is not associated with either a DiaryEntry or a Note.")
 
-
-class Image(models.Model):
-    image = models.ImageField(upload_to=get_image_upload_path , blank=True, null=True)
-    diary_entry = models.ForeignKey(DiaryEntry, on_delete=models.CASCADE, related_name='images', null=True, blank=True)
-    note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name='images', null=True, blank=True)
 

@@ -13,7 +13,7 @@ export default function GameList() {
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [contextMenu, setContextMenu] = useState(null); // { x: number, y: number, gameId: string } | null
+  const [contextMenu, setContextMenu] = useState(null); 
   const [newGame, setNewGame] = useState({
     name: '',
     description: '',
@@ -161,7 +161,6 @@ export default function GameList() {
     if (file) {
       setNewGame(prevState => ({ ...prevState, image: file }));
 
-      // Opcional: Para previsualización
       const reader = new FileReader();
       reader.onloadend = () => {
         setNewGame(prevState => ({ ...prevState, imagePreview: reader.result }));
@@ -286,6 +285,7 @@ export default function GameList() {
           <img src={Añadir} alt="Añadir" className="add-icon" />
         </button>
       </div>
+      
       <div className="game-list-options">
         {gameLists.length > 0 ? (
           gameLists.map(game => (
@@ -347,15 +347,7 @@ export default function GameList() {
                 {newGame.imagePreview && (
                   <div>
                     <img src={newGame.imagePreview} alt="Vista previa" className="image-preview" />
-                    <button className='buttonDeleteImg'
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault(); // Previene el comportamiento predeterminado del botón
-                        setNewGame(prevState => ({ ...prevState, image: null, imagePreview: null }));
-                      }}
-                    >
-                      X
-                    </button>
+
                   </div>
                 )}
               </label>
@@ -409,18 +401,6 @@ export default function GameList() {
                 {editingGame.imagePreview && (
                   <div>
                     <img src={editingGame.imagePreview} alt="Vista previa" className="image-preview" />
-                    <button className='buttonDeleteImg'
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault(); // Previene el comportamiento predeterminado del botón
-                        setEditingGame(prevState => ({ ...prevState, image: null, imagePreview: null }));
-                        if (fileInputRef.current) {
-                          fileInputRef.current.value = null; // Restablece el valor del input de archivo
-                        }
-                      }}
-                    >
-                      X
-                    </button>
                   </div>
                 )}
               </label>

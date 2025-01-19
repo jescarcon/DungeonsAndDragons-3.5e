@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Game, Note, Diary, DiaryEntry, Image
+from .models import Game, Note, Diary, DiaryEntry
 
 #---------------------DIARY ENTRY SERIALIZER---------------------
 class DiaryEntrySerializer(serializers.ModelSerializer):
@@ -30,8 +30,3 @@ class GameSerializer(serializers.ModelSerializer):
         model = Game
         fields = ['id', 'name', 'description', 'image', 'notes', 'diaries','user']
 
-#---------------------IMAGE SERIALIZER---------------------
-class ImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Image
-        fields = ['id', 'image','game','diary' ,'diary_entry', 'note']

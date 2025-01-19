@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { BASE_API_URL } from '../../../constants';
 import Añadir from '/Common/añadir_blanco.png';
@@ -11,10 +11,12 @@ export default function Diary() {
   const [loading, setLoading] = useState(true);
   const [contextMenu, setContextMenu] = useState(null); // Estado para manejar el menú contextual
   const [showModal, setShowModal] = useState(false); // Estado para manejar la ventana emergente
-  const [newDiary, setNewDiary] = useState({ name: '', description: '' }); // Estado para el nuevo diario
+  const [newDiary, setNewDiary] = useState({ name: '', description: '', image: null, imagePreview: null }); // Estado para el nuevo diario
   const [editDiary, setEditDiary] = useState(null); // Estado para el diario en edición
   const [showEditModal, setShowEditModal] = useState(false); // Estado para manejar el modal de edición
+  const [editingDiary, setEditingDiary] = useState(null); // Diario que está siendo editado
   const { pk } = useParams();
+  const fileInputRef = useRef(null);
   //#endregion
 
   //#region Logic
@@ -25,7 +27,7 @@ export default function Diary() {
       try {
         const response = await fetch(`${BASE_API_URL}/api/gameApp/games/${pk}/`, {
           headers: {
-            'Authorization': `Bearer ${token}`, 
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
@@ -38,7 +40,6 @@ export default function Diary() {
         console.error('Error fetching game name:', error);
       }
     };
-    
 
     const fetchDiaries = async () => {
       const token = localStorage.getItem('access');
@@ -46,7 +47,7 @@ export default function Diary() {
       try {
         const response = await fetch(`${BASE_API_URL}/api/gameApp/diaries/`, {
           headers: {
-            'Authorization': `Bearer ${token}`,  // Reemplaza `token` con el valor adecuado
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
@@ -62,7 +63,6 @@ export default function Diary() {
         setLoading(false);
       }
     };
-    
 
     fetchGameName();
     fetchDiaries();
@@ -93,9 +93,8 @@ export default function Diary() {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,  
+          'Authorization': `Bearer ${token}`,
         },
-
       });
 
       if (!response.ok) {
@@ -112,44 +111,58 @@ export default function Diary() {
 
   const handleCreateDiary = async () => {
     const token = localStorage.getItem('access');
+    const formData = new FormData();
+
+    // Añadir los datos del diario al FormData
+    formData.append('name', newDiary.name);
+    formData.append('description', newDiary.description);
+    formData.append('game', pk); // Incluye el ID del juego
+    if (newDiary.image) formData.append('image', newDiary.image); // Añade la imagen si existe
 
     try {
       const response = await fetch(`${BASE_API_URL}/api/gameApp/diaries/`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,  
+          Authorization: `Bearer ${token}`, // El token para la autenticación
         },
-        body: JSON.stringify({ ...newDiary, game: pk }),
+        body: formData, // Usamos FormData en lugar de JSON
       });
-  
+
       if (!response.ok) {
         throw new Error('Error al crear el diario');
       }
-  
+
       const createdDiary = await response.json();
-      setDiaries((prevState) => [...prevState, createdDiary]);
+      setDiaries((prevState) => [...prevState, createdDiary]); // Añadir el nuevo diario al estado
     } catch (error) {
       console.error('Error al crear el diario:', error);
     } finally {
       setShowModal(false);
-      setNewDiary({ name: '', description: '' });
+      setNewDiary({ name: '', description: '', image: null, imagePreview: null }); // Reiniciar el formulario
     }
   };
-  
 
   const handleEditDiary = async () => {
     const token = localStorage.getItem('access');
 
     try {
+      const formData = new FormData();
+      formData.append('name', editDiary.name);
+      formData.append('description', editDiary.description);
+      formData.append('game', editDiary.game);
+
+      if (editDiary.image === null) {
+        formData.append('image', '');
+      } else if (editDiary.image instanceof File) {
+        formData.append('image', editDiary.image, editDiary.image.name);
+      }
+
       const response = await fetch(`${BASE_API_URL}/api/gameApp/diaries/${editDiary.id}/`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,  
-
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(editDiary),
+        body: formData,
       });
 
       if (!response.ok) {
@@ -160,12 +173,48 @@ export default function Diary() {
       setDiaries(prevState =>
         prevState.map(diary => (diary.id === updatedDiary.id ? updatedDiary : diary))
       );
+      setShowEditModal(false);
+      setEditDiary(null);  // Limpiar el estado después de la actualización
     } catch (error) {
       console.error('Error al actualizar el diario:', error);
-    } finally {
-      setShowEditModal(false);
-      setEditDiary(null);
     }
+  };
+
+  const handleCancel = () => {
+    setNewDiary({ name: '', description: '', image: null, imagePreview: null });
+    setShowModal(false);
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewDiary(prevState => ({ ...prevState, image: file }));
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewDiary(prevState => ({ ...prevState, imagePreview: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleEditImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEditDiary(prevState => ({
+        ...prevState,
+        image: file, // Asigna el archivo de imagen
+        imagePreview: URL.createObjectURL(file), // Actualiza la previsualización con la nueva imagen
+      }));
+    }
+  };
+
+  const handleEditDiaryClick = (diary) => {
+    setEditDiary({
+      ...diary,
+      imagePreview: diary.image, // Asignar la imagen actual para mostrarla en el modal de edición
+    });
+    setShowEditModal(true);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -176,38 +225,38 @@ export default function Diary() {
       <div className="diary-header">
         <h1>Diarios de {gameName}</h1>
         <button className='diary-add-button' onClick={() => setShowModal(true)} title="Añadir un diario">
-            <img src={Añadir} alt="Añadir" className="add-icon" />
+          <img src={Añadir} alt="Añadir" className="add-icon" />
         </button>
       </div>
 
       <div className='diary-list'>
-      {diaries.map((diary) => (
-        <div 
-          key={diary.id} 
-          className='diary-item'
-          onContextMenu={(e) => handleContextMenu(e, diary)} // Add context menu handler here
-        >
-          <Link to={`/games/${pk}/diaries/${diary.id}/entries`}>
-            <img src={diary.image} alt="Diario" className='diary-image' />
-            <div className='diary-name'>{diary.name}</div>
-            <div className='diary-overlay'>
-              <div className='diary-description'>{diary.description}</div>
+        {diaries.length > 0 ? (
+          diaries.map((diary) => (
+            <div
+              key={diary.id}
+              className='diary-item'
+              onContextMenu={(e) => handleContextMenu(e, diary)} // Add context menu handler here
+            >
+              <Link to={`/games/${pk}/diaries/${diary.id}/entries`}>
+                <img src={diary.image} alt="Diario" className='diary-image' />
+                <div className='diary-name'>{diary.name}</div>
+                <div className='diary-overlay'>
+                  <div className='diary-description'>{diary.description}</div>
+                </div>
+              </Link>
             </div>
-          </Link>
-        </div>
-      ))}
+          ))
+        ) : (
+          <p className='noGameList'>Aún no tienes ningún diario. ¡Empieza creando uno!</p>
+        )}
       </div>
 
       {contextMenu && (
-        <div 
-          className="context-menu" 
+        <div
+          className="context-menu"
           style={{ top: contextMenu.y, left: contextMenu.x }}
         >
-          <button onClick={() => {
-            setEditDiary(contextMenu.diary);
-            setShowEditModal(true);
-            setContextMenu(null);
-          }}>
+          <button onClick={() => handleEditDiaryClick(contextMenu.diary)}>
             Editar
           </button>
           <button onClick={() => handleDelete(contextMenu.diary.id)}>Eliminar</button>
@@ -222,26 +271,41 @@ export default function Diary() {
             <form onSubmit={(e) => { e.preventDefault(); handleCreateDiary(); }} className="modal-form">
               <label>
                 Nombre:
-                <input 
-                  type="text" 
-                  value={newDiary.name} 
-                  onChange={(e) => setNewDiary({ ...newDiary, name: e.target.value })} 
-                  required 
+                <input
+                  type="text"
+                  value={newDiary.name}
+                  onChange={(e) => setNewDiary({ ...newDiary, name: e.target.value })}
+                  required
+                  placeholder='Diario de Nathaniel'
                   maxLength={30}
                 />
               </label>
               <label>
                 Descripción:
-                <textarea 
+                <textarea
                   maxLength={50}
-                  value={newDiary.description} 
+                  value={newDiary.description}
+                  placeholder='Viejo cuaderno de cuero algo raído, contiene dibujos y anotaciones...'
                   onChange={(e) => setNewDiary({ ...newDiary, description: e.target.value })}
                 />
               </label>
-              
+              <label>
+                Imagen:
+                <input
+                  type="file"
+                  accept="image/*"
+                  title=""
+                  onChange={handleImageChange}
+                />
+                {newDiary.imagePreview && (
+                  <div>
+                    <img src={newDiary.imagePreview} alt="Vista previa" className="image-preview" />
+                  </div>
+                )}
+              </label>
               <div className="modal-buttons">
-                <button type="submit">Crear</button>
-                <button type="button" onClick={() => setShowModal(false)}>Cancelar</button>
+                <button type="submit">Guardar</button>
+                <button type="button" onClick={handleCancel}>Cancelar</button>
               </div>
             </form>
           </div>
@@ -256,21 +320,33 @@ export default function Diary() {
             <form onSubmit={(e) => { e.preventDefault(); handleEditDiary(); }} className="modal-form">
               <label>
                 Nombre:
-                <input 
-                  type="text" 
-                  value={editDiary.name} 
+                <input
+                  type="text"
+                  value={editDiary.name}
                   onChange={(e) => setEditDiary({ ...editDiary, name: e.target.value })}
-                  required 
-                  maxLength={30}
+                  required
                 />
               </label>
               <label>
                 Descripción:
-                <textarea 
-                  maxLength={50}
-                  value={editDiary.description} 
+                <textarea
+                  value={editDiary.description}
                   onChange={(e) => setEditDiary({ ...editDiary, description: e.target.value })}
                 />
+              </label>
+              <label>
+                Imagen:
+                <input
+                  title=""
+                  type="file"
+                  accept="image/*"
+                  onChange={handleEditImageChange}
+                />
+                {editDiary.imagePreview && (
+                  <div>
+                    <img src={editDiary.imagePreview} alt="Vista previa" className="image-preview" />
+                  </div>
+                )}
               </label>
               <div className="modal-buttons">
                 <button type="submit">Actualizar</button>
