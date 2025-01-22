@@ -1,441 +1,364 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { BASE_API_URL } from '../../../../constants';
-import Añadir from "/Common/añadir_negro.png";
-import Entrada from "/Character/Diary/Entrada.jpg";
+import Añadir from '/Common/añadir_blanco.png';
+import Entrada from '/Character/Diary/Entrada.jpg';
 import './DiaryEntry.css';
 
-export default function DiaryEntry() {
-  const { id } = useParams();
-  const [entries, setEntries] = useState([]);
+export default function DiaryEntryList() {
+  //#region States
   const [diaryName, setDiaryName] = useState('');
+  const { pk, id } = useParams();
+  const [showModal, setShowModal] = useState(false); // Estado para manejar la ventana emergente
+  const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [contextMenu, setContextMenu] = useState(null); // Estado para manejar el menú contextual
+
+  const [editEntry, setEditEntry] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false); // Estado para manejar el modal de edición
+
+  const [newEntry, setNewEntry] = useState({ name: '', description: '' });
+
+  // Paginación
   const [currentPage, setCurrentPage] = useState(1);
-  const [showModal, setShowModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [newEntry, setNewEntry] = useState({
-    name: '',
-    description: '',
-    image1: null,
-    image2: null,
-    image3: null,
-  });
-  const [editingEntry, setEditingEntry] = useState({
-    id: null,
-    name: '',
-    description: '',
-    image1: null,
-    image2: null,
-    image3: null,
-    imagePreview1: null,
-    imagePreview2: null,
-    imagePreview3: null
-  });
-  const [contextMenu, setContextMenu] = useState(null);
+  const itemsPerPage = 7;
 
-  const entriesPerPage = 5;
+  //#endregion
 
+  //#region Logic
+
+  //#region Carga de datos
   useEffect(() => {
-    const fetchEntries = async () => {
+    const fetchDiaryName = async () => {
+      const token = localStorage.getItem('access');
       try {
-        const response = await fetch(`${BASE_API_URL}api/characterApp/diaryentries/`);
+        const response = await fetch(`${BASE_API_URL}/api/gameApp/diaries/${id}/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const diaryData = await response.json();
+        setDiaryName(diaryData.name);
+      } catch (error) {
+        console.error('Error fetching diary name:', error);
+      }
+    };
+
+    const fetchEntries = async () => {
+      const token = localStorage.getItem('access');
+
+      try {
+        const response = await fetch(`${BASE_API_URL}/api/gameApp/diaryentries/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
         const data = await response.json();
-        
         const filteredEntries = data.filter(entry => entry.diary === parseInt(id));
         setEntries(filteredEntries);
-        
-        const diaryResponse = await fetch(`${BASE_API_URL}api/characterApp/diaries/${id}/`);
-        const diaryData = await diaryResponse.json();
-        setDiaryName(diaryData.name);
-        
       } catch (error) {
-        console.error('Error fetching diary entries:', error);
+        console.error('Error fetching diaries:', error);
       } finally {
         setLoading(false);
       }
     };
 
+    fetchDiaryName();
     fetchEntries();
   }, [id]);
+  //#endregion
 
-  const indexOfLastEntry = currentPage * entriesPerPage;
-  const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
-  const currentEntries = entries.slice(indexOfFirstEntry, indexOfLastEntry);
-
-  const totalPages = Math.ceil(entries.length / entriesPerPage);
-
-  const paginate = (pageNumber) => {
-    if (pageNumber >= 1 && pageNumber <= totalPages) {
-      setCurrentPage(pageNumber);
+  //#region Paginación
+  const handleNextPage = () => {
+    if ((currentPage * itemsPerPage) < entries.length) {
+      setCurrentPage(prevPage => prevPage + 1);
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewEntry({ ...newEntry, [name]: value });
-  };
-
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    setNewEntry({ ...newEntry, [name]: files[0] });
-  };
-
-  const handleCreateEntry = async () => {
-    const formData = new FormData();
-    formData.append('name', newEntry.name);
-    formData.append('description', newEntry.description);
-    formData.append('diary', id);
-  
-    if (newEntry.image1) formData.append('image1', newEntry.image1);
-    if (newEntry.image2) formData.append('image2', newEntry.image2);
-    if (newEntry.image3) formData.append('image3', newEntry.image3);
-  
-    try {
-      const response = await fetch(`${BASE_API_URL}api/characterApp/diaryentries/`, {
-        method: 'POST',
-        body: formData,
-      });
-  
-      if (response.ok) {
-        const createdEntry = await response.json();
-        setEntries([createdEntry, ...entries]);
-        setNewEntry({
-          name: '',
-          description: '',
-          image1: null,
-          image2: null,
-          image3: null,
-        });
-        setShowModal(false);
-      } else {
-        console.error('Error creating entry:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error creating entry:', error);
-    }
-  };
-  
-
-  const handleDeleteEntry = async (entryId) => {
-    try {
-      const response = await fetch(`${BASE_API_URL}api/characterApp/diaryentries/${entryId}/`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setEntries(entries.filter(entry => entry.id !== entryId));
-        setContextMenu(null);
-      } else {
-        const errorText = await response.text();
-        console.error('Error deleting entry:', errorText);
-      }
-    } catch (error) {
-      console.error('Error deleting entry:', error);
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prevPage => prevPage - 1);
     }
   };
 
-  const handleUpdateEntry = async () => {
-    const formData = new FormData();
-    formData.append('name', editingEntry.name);
-    formData.append('description', editingEntry.description);
-  
-    if (editingEntry.image1) formData.append('image1', editingEntry.image1);
-    if (editingEntry.image2) formData.append('image2', editingEntry.image2);
-    if (editingEntry.image3) formData.append('image3', editingEntry.image3);
-  
-    try {
-      const response = await fetch(`${BASE_API_URL}/api/characterApp/diaryentries/${editingEntry.id}/`, {
-        method: 'PUT',
-        body: formData,
-      });
-  
-      if (!response.ok) {
-        throw new Error('Error al actualizar la entrada');
-      }
-  
-      const updatedEntry = await response.json();
-      setEntries(prevEntries =>
-        prevEntries.map(entry => (entry.id === updatedEntry.id ? updatedEntry : entry))
-      );
-    } catch (error) {
-      console.error('Error al actualizar la entrada:', error);
-    } finally {
-      setShowEditModal(false);
-      setEditingEntry(null);
-    }
-  };
-  
-  const handleImageChange = (e) => {
-    const { name, files } = e.target;
-    if (files[0]) {
-      const fileURL = URL.createObjectURL(files[0]);
-      setEditingEntry(prevState => ({
-        ...prevState,
-        [name]: files[0],
-        [`imagePreview${name.charAt(name.length - 1)}`]: fileURL
-      }));
-    }
-  };
-  
-  const handleImageDelete = (imageKey) => {
-    setEditingEntry(prevState => ({
-      ...prevState,
-      [imageKey]: null,
-      [`imagePreview${imageKey.charAt(imageKey.length - 1)}`]: null
-    }));
-  };
-  
-  
+  const indexOfLastEntry = currentPage * itemsPerPage;
+  const indexOfFirstEntry = indexOfLastEntry - itemsPerPage;
+  const currentEntries = [...entries]
+    .reverse() // Ordenar primero en orden inverso (más recientes primero)
+    .slice(indexOfFirstEntry, indexOfLastEntry);
 
+  const totalPages = Math.ceil(entries.length / itemsPerPage);
 
+  //#endregion
+
+  //#region Menu contextual(click derecho)
   const handleContextMenu = (e, entry) => {
-    e.preventDefault();
-    setContextMenu({ x: e.clientX, y: e.clientY, entry });
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setNewEntry({
-      name: '',
-      description: '',
-      image1: null,
-      image2: null,
-      image3: null,
+    e.preventDefault(); // Evita que el menú contextual del navegador aparezca
+    setContextMenu({
+      x: e.pageX,
+      y: e.pageY,
+      entry: entry, // Guarda la entrada seleccionada para las acciones
     });
   };
 
-
-  
-  const handleCloseEditModal = () => {
-    setShowEditModal(false);
-    setEditingEntry(null);
+  const closeContextMenu = () => {
+    setContextMenu(null); // Cierra el menú contextual
   };
 
-  const openEditModal = (entry) => {
-    setEditingEntry(entry);
+  const handleCancel = () => {
+    setNewEntry({ name: '', description: '' });
+    setShowModal(false);
+  };
+  //--------------Click fuera cierra menú contextual--------------
+  useEffect(() => {
+    const handleClickOutside = () => {
+      closeContextMenu();
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+  //#endregion
+
+  //#region CRUD
+  const handleCreateEntry = async () => {
+    const token = localStorage.getItem('access');
+    const formData = new FormData();
+
+    // Añadir los datos de la entrada al FormData
+    formData.append('name', newEntry.name);
+    formData.append('description', newEntry.description);
+    formData.append('diary', id); // Incluye el ID del diario
+
+    try {
+      const response = await fetch(`${BASE_API_URL}/api/gameApp/diaryentries/`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // El token para la autenticación
+        },
+        body: formData, // Usamos FormData en lugar de JSON
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al crear el diario');
+      }
+
+      const createdEntry = await response.json();
+      setEntries((prevState) => [...prevState, createdEntry]); // Añadir la nueva entrada al estado
+    } catch (error) {
+      console.error('Error al crear la entrada:', error);
+    } finally {
+      setShowModal(false);
+      setNewEntry({ name: '', description: '' }); // Reiniciar el formulario
+    }
+  };
+
+  const handleEditEntryClick = (entry) => {
+    setEditEntry({
+      ...entry,
+    });
     setShowEditModal(true);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const handleDelete = async (entryId) => {
+    const token = localStorage.getItem('access');
+
+    try {
+      const response = await fetch(`${BASE_API_URL}/api/gameApp/diaryentries/${entryId}/`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al eliminar la entrada');
+      }
+
+      // Actualizar las entradas eliminando la entrada eliminada
+      setEntries(prevState => {
+        const updatedEntries = prevState.filter(entry => entry.id !== entryId);
+
+        // Verificar si la página actual queda vacía
+        const totalPagesAfterDelete = Math.ceil(updatedEntries.length / itemsPerPage);
+        if (currentPage > totalPagesAfterDelete && totalPagesAfterDelete > 0) {
+          setCurrentPage(totalPagesAfterDelete); // Ajustar a la última página válida
+        }
+
+        return updatedEntries;
+      });
+    } catch (error) {
+      console.error('Error al eliminar la entrada:', error);
+    } finally {
+      setContextMenu(null);
+    }
+  };
+
+
+  const handleEditEntry = async () => {
+    const token = localStorage.getItem('access');
+
+    try {
+      const formData = new FormData();
+      formData.append('name', editEntry.name);
+      formData.append('description', editEntry.description);
+      formData.append('diary', id);
+
+      const response = await fetch(`${BASE_API_URL}/api/gameApp/diaryentries/${editEntry.id}/`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al actualizar el diario');
+      }
+
+      const updatedEntry = await response.json();
+      setEntries(prevState =>
+        prevState.map(entry => (entry.id === updatedEntry.id ? updatedEntry : entry))
+      );
+      setShowEditModal(false);
+      setEditEntry(null);  // Limpiar el estado después de la actualización
+    } catch (error) {
+      console.error('Error al actualizar:', error);
+    }
+  };
+  //#endregion 
+
+  if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="diary-entry-container">
-      <div className="diary-entry-header">
-        <h1>{diaryName}</h1>
-        <button className="diary-entry-add-button" onClick={() => setShowModal(true)}>
-          <img src={Añadir} alt="Añadir" />
+    <div className='entries-container'>
+      <div className="entries-header">
+        <h1>Entradas del {diaryName}</h1>
+        <button className='entries-add-button' onClick={() => setShowModal(true)} title="Añadir una entrada">
+          <img src={Añadir} alt="Añadir" className="add-icon" />
         </button>
       </div>
 
-      <div className="diary-entry-entries">
+      <div className='entries-list'>
         {currentEntries.length > 0 ? (
-          currentEntries.map(entry => (
-            <div key={entry.id} className="diary-entry" onContextMenu={(e) => handleContextMenu(e, entry)}>
-              <img src={Entrada} alt="Entrada" className="entry-image" />
-              <h2 className="entry-title">{entry.name}</h2>
+          currentEntries.map((entry) => ( // Eliminar reverse() aquí
+            <div key={entry.id} className='entries-item' onContextMenu={(e) => handleContextMenu(e, entry)}>
+              <img src={Entrada} alt="Entry" className="entry-icon" />
+              <Link to={`${entry.id}`}>
+                <div className='entries-name'>{entry.name}</div>
+              </Link>
             </div>
           ))
         ) : (
-          <p>No hay entradas para el diario aún.</p>
+          <p className='noEntriesList'>Aún no tienes ninguna entrada. ¡Empieza creando una!</p>
+        )}
+
+        {entries.length > itemsPerPage && (
+          <div className="pagination">
+            <button onClick={handlePrevPage} disabled={currentPage === 1}>Anterior</button>
+            <span>Página {currentPage} de {totalPages}</span>
+            <button onClick={handleNextPage} disabled={currentPage * itemsPerPage >= entries.length}>Siguiente</button>
+          </div>
         )}
       </div>
 
-      {/* Paginación */}
-      {totalPages > 1 && (
-        <div className="pagination">
-          <button
-            onClick={() => paginate(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="page-button"
-          >
-            &laquo; Anterior
+
+      {contextMenu && (
+        <div
+          className="context-menu"
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+        >
+          <button onClick={() => handleEditEntryClick(contextMenu.entry)}>
+            Editar
           </button>
-          <span className="current-page">{`Página ${currentPage} de ${totalPages}`}</span>
-          <button
-            onClick={() => paginate(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="page-button"
-          >
-            Siguiente &raquo;
-          </button>
+          <button onClick={() => handleDelete(contextMenu.entry.id)}>Eliminar</button>
         </div>
       )}
 
-      {/* Modal para crear una nueva entrada */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <button className="modal-close" onClick={handleCloseModal}>×</button>
-            <h2>Nueva Entrada</h2>
+            <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
+            <h2>Crear una nueva entrada para {diaryName}</h2>
             <form onSubmit={(e) => { e.preventDefault(); handleCreateEntry(); }} className="modal-form">
               <label>
                 Nombre:
                 <input
                   type="text"
-                  name="name"
                   value={newEntry.name}
-                  onChange={handleInputChange}
+                  onChange={(e) => setNewEntry({ ...newEntry, name: e.target.value })}
                   required
+                  placeholder='Día 1: Comienzo de la aventura'
                   maxLength={30}
                 />
               </label>
               <label>
                 Descripción:
                 <textarea
-                  name="description"
+                  maxLength={50}
                   value={newEntry.description}
-                  onChange={handleInputChange}
-                  maxLength={500}
+                  placeholder='Amanece un nuevo día en la ciudad de Escarlia...'
+                  onChange={(e) => setNewEntry({ ...newEntry, description: e.target.value })}
                 />
               </label>
-
-              {/* Campos para subir imágenes */}
-              <label>
-                Imagen 1:
-                <input
-                  type="file"
-                  name="image1"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                />
-                {newEntry.image1 && (
-                  <div>
-                    <img src={URL.createObjectURL(newEntry.image1)} alt="Vista previa" className="image-preview" />
-                  </div>
-                )}
-              </label>
-              <label>
-                Imagen 2:
-                <input
-                  type="file"
-                  name="image2"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                />
-                {newEntry.image2 && (
-                  <div>
-                    <img src={URL.createObjectURL(newEntry.image2)} alt="Vista previa" className="image-preview" />
-                  </div>
-                )}
-              </label>
-              <label>
-                Imagen 3:
-                <input
-                  type="file"
-                  name="image3"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                />
-                {newEntry.image3 && (
-                  <div>
-                    <img src={URL.createObjectURL(newEntry.image3)} alt="Vista previa" className="image-preview" />
-                  </div>
-                )}
-              </label>
-
 
               <div className="modal-buttons">
-                <button type="submit">Crear</button>
-                <button type="button" onClick={handleCloseModal}>Cancelar</button>
+                <button type="submit">Guardar</button>
+                <button type="button" onClick={handleCancel}>Cancelar</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Modal para editar una entrada */}
-      {showEditModal && editingEntry && (
+      {showEditModal && editEntry && (
         <div className="modal-overlay">
           <div className="modal">
-            <button className="modal-close" onClick={handleCloseEditModal}>×</button>
-            <h2>Editar Entrada</h2>
-            <form className="modal-form">
+            <button className="modal-close" onClick={() => setShowEditModal(false)}>×</button>
+            <h2>Editar Diario</h2>
+            <form onSubmit={(e) => { e.preventDefault(); handleEditEntry(); }} className="modal-form">
               <label>
                 Nombre:
                 <input
                   type="text"
-                  name="name"
-                  value={editingEntry.name}
-                  onChange={(e) => setEditingEntry({ ...editingEntry, name: e.target.value })}
+                  value={editEntry.name}
+                  onChange={(e) => setEditEntry({ ...editEntry, name: e.target.value })}
                   required
-                  maxLength={30}
+                  maxLength={100}
+                  placeholder='Día 1: Comienzo de la aventura'
                 />
               </label>
               <label>
                 Descripción:
                 <textarea
-                  name="description"
-                  value={editingEntry.description}
-                  onChange={(e) => setEditingEntry({ ...editingEntry, description: e.target.value })}
-                  maxLength={500}
+                  value={editEntry.description}
+                  maxLength={300}
+                  placeholder='Amanece un nuevo día en la ciudad de Escarlia...'
+                  onChange={(e) => setEditEntry({ ...editEntry, description: e.target.value })}
                 />
-              </label>
-
-              {/* Campos para subir imágenes */}
-              <label>
-                Imagen 1:
-                <input
-                  type="file"
-                  name="image1"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-                {editingEntry.imagePreview1 && (
-                  <div>
-                    <img src={editingEntry.imagePreview1} alt="Vista previa" className="image-preview" />
-                    <button type="button" onClick={() => handleImageDelete('image1')}>Eliminar Imagen</button>
-                  </div>
-                )}
-              </label>
-              <label>
-                Imagen 2:
-                <input
-                  type="file"
-                  name="image2"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-                {editingEntry.imagePreview2 && (
-                  <div>
-                    <img src={editingEntry.imagePreview2} alt="Vista previa" className="image-preview" />
-                    <button type="button" onClick={() => handleImageDelete('image2')}>Eliminar Imagen</button>
-                  </div>
-                )}
-              </label>
-              <label>
-                Imagen 3:
-                <input
-                  type="file"
-                  name="image3"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-                {editingEntry.imagePreview3 && (
-                  <div>
-                    <img src={editingEntry.imagePreview3} alt="Vista previa" className="image-preview" />
-                    <button type="button" onClick={() => handleImageDelete('image3')}>Eliminar Imagen</button>
-                  </div>
-                )}
               </label>
 
               <div className="modal-buttons">
-                <button type="submit" onClick={handleUpdateEntry}>Guardar Cambios</button>
-                <button type="button" onClick={handleCloseEditModal}>Cancelar</button>
+                <button type="submit">Actualizar</button>
+                <button type="button" onClick={() => setShowEditModal(false)}>Cancelar</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Menú contextual para eliminar una entrada */}
-      {contextMenu && (
-        <div className="context-menu" style={{ top: contextMenu.y, left: contextMenu.x }}>
-          <button onClick={() => { openEditModal(contextMenu.entry); setContextMenu(null); }}>Editar</button>
-          <button onClick={() => { handleDeleteEntry(contextMenu.entry.id); setContextMenu(null); }}>Eliminar</button>
-        </div>
-      )}
     </div>
   );
 }
