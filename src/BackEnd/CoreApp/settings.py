@@ -1,10 +1,23 @@
 from pathlib import Path
 from corsheaders.defaults import default_headers #CorsHeaders
 import os
+import jwt
+from datetime import datetime, timedelta, timezone
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-0=ac7xxn=uswnz566l%j8*9y5c77#-e9*v_o42qa7^c-rhow!0'
+
+
+def create_jwt(username, access_token, refresh_token):
+    payload = {
+        'username': username,
+        'access': access_token,
+        'refresh': refresh_token,
+        'exp': datetime.now(timezone.utc) + timedelta(hours=1)  # Use timezone-aware datetime
+    }
+    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+    return token
 
 DEBUG = True
 
@@ -12,6 +25,8 @@ DEBUG = True
 MEDIA_URL = '/media/'  
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
 #---MEDIA URL CONFIG---
+
+
 
 ALLOWED_HOSTS = [    
     '213.194.141.204',

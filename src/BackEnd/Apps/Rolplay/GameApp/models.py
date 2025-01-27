@@ -72,6 +72,9 @@ class DiaryEntry(models.Model):
     name = models.CharField(max_length=100, blank=True, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
     diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name='entries')  # Diary Relation
+    image1 = models.ImageField(upload_to='images/rolplay/games_app/diary_entries/', blank=True, null=True)
+    image2 = models.ImageField(upload_to='images/rolplay/games_app/diary_entries/', blank=True, null=True)
+    image3 = models.ImageField(upload_to='images/rolplay/games_app/diary_entries/', blank=True, null=True)
 
 
 

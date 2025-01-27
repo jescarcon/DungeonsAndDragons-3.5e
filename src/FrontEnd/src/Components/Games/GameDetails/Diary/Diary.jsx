@@ -325,12 +325,14 @@ export default function Diary() {
                   value={editDiary.name}
                   onChange={(e) => setEditDiary({ ...editDiary, name: e.target.value })}
                   required
+                  placeholder='Diario de Nathaniel'
                 />
               </label>
               <label>
                 Descripción:
                 <textarea
                   value={editDiary.description}
+                  placeholder='Viejo cuaderno de cuero algo raído, contiene dibujos y anotaciones...'
                   onChange={(e) => setEditDiary({ ...editDiary, description: e.target.value })}
                 />
               </label>

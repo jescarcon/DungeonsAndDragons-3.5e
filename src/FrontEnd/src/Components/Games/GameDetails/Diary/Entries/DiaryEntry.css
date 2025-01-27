@@ -73,7 +73,9 @@
 .modal-close{
   user-select: none;
 }
-
+.entry-detail-description{
+  user-select: none;
+}
 .pagination {
   display: flex;
   justify-content: center;
@@ -100,6 +102,78 @@
   background-color: #606060;
   cursor: not-allowed;
 }
+
+/*----Images from entry-detail-----*/
+.image-container {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.image-container img {
+  width: 150px; /* Tamaño fijo para las miniaturas */
+  height: 150px;
+  object-fit: cover;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer; /* Indicador de clic */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.image-container img:hover {
+  transform: scale(1.1); /* Ampliación al pasar el mouse */
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Fondo oscuro para la imagen ampliada */
+.zoomed-image-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Contenedor de la imagen ampliada */
+.zoomed-image-container {
+  position: relative;
+  max-width: 20%;  /* Ajuste del tamaño máximo de la imagen */
+  max-height: 20%; /* Ajuste del tamaño máximo de la imagen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Imagen ampliada */
+.zoomed-image {
+  max-width: 100%;   /* La imagen no superará el contenedor */
+  max-height: 100%;  /* La imagen no superará el contenedor */
+  object-fit: contain; /* Asegura que la imagen mantenga la proporción sin recortarse */
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.2);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+
+
 @media (max-width: 768px) {
   .entries-container{
     width: 80%;

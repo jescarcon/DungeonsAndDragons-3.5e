@@ -25,6 +25,7 @@
     border: solid white 1px;
     padding: 15px;
     font: inherit;
+    cursor: pointer;
 }
 .botonInicio:hover{
     background-color: rgb(73, 73, 73);

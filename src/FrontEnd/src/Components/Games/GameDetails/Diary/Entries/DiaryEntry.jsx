@@ -14,10 +14,25 @@ export default function DiaryEntryList() {
   const [loading, setLoading] = useState(true);
   const [contextMenu, setContextMenu] = useState(null); // Estado para manejar el menú contextual
 
-  const [editEntry, setEditEntry] = useState(null);
+  const [editEntry, setEditEntry] = useState({
+    id: null,
+    name: '',
+    description: '',
+    image1: null,
+    image2: null,
+    image3: null,
+    imagePreview1: null,
+    imagePreview2: null,
+    imagePreview3: null,
+  });
   const [showEditModal, setShowEditModal] = useState(false); // Estado para manejar el modal de edición
 
-  const [newEntry, setNewEntry] = useState({ name: '', description: '' });
+  const [newEntry, setNewEntry] = useState({ name: '', description: '', image1: null, imagePreview1: null, image2: null, imagePreview2: null, image3: null, imagePreview3: null });
+
+  const [selectedEntry, setSelectedEntry] = useState(null);
+  const [showEntryModal, setShowEntryModal] = useState(false);
+
+  const [zoomedImage, setZoomedImage] = useState(null);
 
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -74,6 +89,21 @@ export default function DiaryEntryList() {
     fetchDiaryName();
     fetchEntries();
   }, [id]);
+
+  const handleImageChange = (e, imageKey, previewKey) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewEntry(prevState => ({ ...prevState, [imageKey]: file }));
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewEntry(prevState => ({ ...prevState, [previewKey]: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+
   //#endregion
 
   //#region Paginación
@@ -114,7 +144,16 @@ export default function DiaryEntryList() {
   };
 
   const handleCancel = () => {
-    setNewEntry({ name: '', description: '' });
+    setNewEntry({
+      name: '',
+      description: '',
+      image1: null,
+      imagePreview1: null,
+      image2: null,
+      imagePreview2: null,
+      image3: null,
+      imagePreview3: null
+    });
     setShowModal(false);
   };
   //--------------Click fuera cierra menú contextual--------------
@@ -129,6 +168,11 @@ export default function DiaryEntryList() {
       document.removeEventListener('click', handleClickOutside);
     };
   }, []);
+
+  const handleCloseModal = () => {
+    setShowEntryModal(false);
+    setSelectedEntry(null);
+  };
   //#endregion
 
   //#region CRUD
@@ -140,6 +184,11 @@ export default function DiaryEntryList() {
     formData.append('name', newEntry.name);
     formData.append('description', newEntry.description);
     formData.append('diary', id); // Incluye el ID del diario
+
+    // Añadir las imágenes si están disponibles
+    if (newEntry.image1) formData.append('image1', newEntry.image1);
+    if (newEntry.image2) formData.append('image2', newEntry.image2);
+    if (newEntry.image3) formData.append('image3', newEntry.image3);
 
     try {
       const response = await fetch(`${BASE_API_URL}/api/gameApp/diaryentries/`, {
@@ -160,13 +209,22 @@ export default function DiaryEntryList() {
       console.error('Error al crear la entrada:', error);
     } finally {
       setShowModal(false);
-      setNewEntry({ name: '', description: '' }); // Reiniciar el formulario
+      setNewEntry({ name: '', description: '', image1: null, imagePreview1: null, image2: null, imagePreview2: null, image3: null, imagePreview3: null }); // Reiniciar el formulario
     }
   };
 
+
   const handleEditEntryClick = (entry) => {
     setEditEntry({
-      ...entry,
+      id: entry.id,
+      name: entry.name,
+      description: entry.description,
+      image1: entry.image1 || null,
+      image2: entry.image2 || null,
+      image3: entry.image3 || null,
+      imagePreview1: entry.image1 ? `${BASE_API_URL}${entry.image1}` : null,
+      imagePreview2: entry.image2 ? `${BASE_API_URL}${entry.image2}` : null,
+      imagePreview3: entry.image3 ? `${BASE_API_URL}${entry.image3}` : null,
     });
     setShowEditModal(true);
   };
@@ -209,13 +267,17 @@ export default function DiaryEntryList() {
 
   const handleEditEntry = async () => {
     const token = localStorage.getItem('access');
+    const formData = new FormData();
+    formData.append('name', editEntry.name);
+    formData.append('description', editEntry.description);
+    formData.append('diary', id);
+
+    // Solo añadir las imágenes si han sido modificadas
+    if (editEntry.image1) formData.append('image1', editEntry.image1);
+    if (editEntry.image2) formData.append('image2', editEntry.image2);
+    if (editEntry.image3) formData.append('image3', editEntry.image3);
 
     try {
-      const formData = new FormData();
-      formData.append('name', editEntry.name);
-      formData.append('description', editEntry.description);
-      formData.append('diary', id);
-
       const response = await fetch(`${BASE_API_URL}/api/gameApp/diaryentries/${editEntry.id}/`, {
         method: 'PUT',
         headers: {
@@ -238,6 +300,7 @@ export default function DiaryEntryList() {
       console.error('Error al actualizar:', error);
     }
   };
+
   //#endregion 
 
   if (loading) return <div>Loading...</div>;
@@ -254,11 +317,11 @@ export default function DiaryEntryList() {
       <div className='entries-list'>
         {currentEntries.length > 0 ? (
           currentEntries.map((entry) => ( // Eliminar reverse() aquí
-            <div key={entry.id} className='entries-item' onContextMenu={(e) => handleContextMenu(e, entry)}>
+            <div key={entry.id} className='entries-item' onContextMenu={(e) => handleContextMenu(e, entry)} onClick={() => { setSelectedEntry(entry); setShowEntryModal(true); }}>
               <img src={Entrada} alt="Entry" className="entry-icon" />
-              <Link to={`${entry.id}`}>
-                <div className='entries-name'>{entry.name}</div>
-              </Link>
+
+              <div className='entries-name'>{entry.name}</div>
+
             </div>
           ))
         ) : (
@@ -290,7 +353,7 @@ export default function DiaryEntryList() {
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
+            <button className="modal-close" onClick={handleCancel}>×</button>
             <h2>Crear una nueva entrada para {diaryName}</h2>
             <form onSubmit={(e) => { e.preventDefault(); handleCreateEntry(); }} className="modal-form">
               <label>
@@ -314,6 +377,47 @@ export default function DiaryEntryList() {
                 />
               </label>
 
+              <label>
+                Imagen 1:
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange(e, 'image1', 'imagePreview1')}
+                />
+                {newEntry.imagePreview1 && (
+                  <div>
+                    <img src={newEntry.imagePreview1} alt="Vista previa 1" className="image-preview" />
+                  </div>
+                )}
+              </label>
+
+              <label>
+                Imagen 2:
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange(e, 'image2', 'imagePreview2')}
+                />
+                {newEntry.imagePreview2 && (
+                  <div>
+                    <img src={newEntry.imagePreview2} alt="Vista previa 2" className="image-preview" />
+                  </div>
+                )}
+              </label>
+
+              <label>
+                Imagen 3:
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange(e, 'image3', 'imagePreview3')}
+                />
+                {newEntry.imagePreview3 && (
+                  <div>
+                    <img src={newEntry.imagePreview3} alt="Vista previa 3" className="image-preview" />
+                  </div>
+                )}
+              </label>
               <div className="modal-buttons">
                 <button type="submit">Guardar</button>
                 <button type="button" onClick={handleCancel}>Cancelar</button>
@@ -358,6 +462,48 @@ export default function DiaryEntryList() {
           </div>
         </div>
       )}
+
+      {showEntryModal && selectedEntry && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={handleCloseModal}>×</button>
+            <h2>{selectedEntry.name}</h2>
+            <div className="entry-detail-description"><p>{selectedEntry.description}</p></div>
+            <div className="image-container">
+              {selectedEntry.image1 && (
+                <img
+                  src={selectedEntry.image1}
+                  alt="Imagen 1"
+                  onClick={() => setZoomedImage(selectedEntry.image1)}
+                />
+              )}
+              {selectedEntry.image2 && (
+                <img
+                  src={selectedEntry.image2}
+                  alt="Imagen 2"
+                  onClick={() => setZoomedImage(selectedEntry.image2)}
+                />
+              )}
+              {selectedEntry.image3 && (
+                <img
+                  src={selectedEntry.image3}
+                  alt="Imagen 3"
+                  onClick={() => setZoomedImage(selectedEntry.image3)}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {zoomedImage && (
+        <div className="zoomed-image-overlay" onClick={() => setZoomedImage(null)}>
+          <div className="zoomed-image-container">
+            <img src={zoomedImage} alt="Imagen ampliada" className="zoomed-image" />
+          </div>
+        </div>
+      )}
+
 
     </div>
   );

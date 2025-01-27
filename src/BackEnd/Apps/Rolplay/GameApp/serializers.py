@@ -5,7 +5,7 @@ from .models import Game, Note, Diary, DiaryEntry
 class DiaryEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = DiaryEntry
-        fields = ['id', 'name', 'description','diary']
+        fields = ['id', 'name', 'description','diary','image1','image2','image3']
 
 #---------------------DIARY SERIALIZER---------------------
 class DiarySerializer(serializers.ModelSerializer):
