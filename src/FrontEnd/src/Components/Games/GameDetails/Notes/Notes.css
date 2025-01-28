@@ -1,0 +1,48 @@
+/* Contenedor general */
+.notes-container {
+    width: 80%;
+    margin: 0 auto;
+    border-radius: 8px;
+    margin-top: 2%;
+    user-select: none;
+}
+
+/* Contenedor de las pestañas */
+.tab-container {
+    display: flex;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab {
+    padding: 12px 16px;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    font-weight: bold;
+    user-select: none;
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+.tab:hover {
+    transform: scale(1.03);
+}
+
+.content {
+    padding: 10px;
+    margin-bottom: 1%;
+}
+.note-card{
+    width: 98%;
+    margin: 0 auto;
+    margin-bottom: 1%;
+    background-color: #ffffff84;
+    border-radius: 3px;
+    padding: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.318);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+
+}
