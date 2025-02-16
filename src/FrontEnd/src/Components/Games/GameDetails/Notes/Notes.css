@@ -13,7 +13,11 @@
     cursor: pointer;
     border-radius: 8px 8px 0 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;  /* Evita la barra de desplazamiento */
+
 }
+
+.tab-content {}
 
 .tab {
     padding: 12px 16px;
@@ -24,18 +28,26 @@
     font-weight: bold;
     user-select: none;
     width: 100%;
-    flex-wrap: nowrap;
-}
 
-.tab:hover {
-    transform: scale(1.03);
 }
-
+.entries-header{
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+.noteList-container{
+    min-height: 370px;
+}
 .content {
     padding: 10px;
     margin-bottom: 1%;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribuye los elementos */
 }
-.note-card{
+.pagination{
+}
+.note-card {
     width: 98%;
     margin: 0 auto;
     margin-bottom: 1%;
@@ -44,5 +56,59 @@
     padding: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.318);
     transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+
+@media (min-width: 500px) {
+
+    /* Contenedor de las pestañas */
+    .tab-container {
+        display: flex;
+        cursor: pointer;
+        border-radius: 8px 8px 0 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        /* Asegura que el contenedor ocupe todo el ancho disponible */
+        white-space: nowrap;
+        /* Evita que las pestañas se envuelvan en varias filas */
+        overflow-x: auto;
+        /* Permite desplazarse horizontalmente si las pestañas se desbordan */
+        overflow-y: hidden;
+        /* Elimina el desplazamiento vertical */
+
+    }
+
+    /* Barra de desplazamiento horizontal */
+    .tab-container::-webkit-scrollbar {
+        height: 8px;
+        /* Altura de la barra de desplazamiento */
+    }
+
+    .tab-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        /* Color de fondo de la pista de la barra */
+    }
+
+    .tab-container::-webkit-scrollbar-thumb {
+        background: #888;
+        /* Color del "dedo" de la barra de desplazamiento */
+        border-radius: 10px;
+    }
+
+    .tab-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
+        /* Color al pasar el ratón sobre la barra de desplazamiento */
+    }
+
+    /* Estilo para cada pestaña */
+    .tab {
+        padding: 12px 16px;
+        text-align: center;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        cursor: pointer;
+        border-radius: 8px 8px 0 0;
+        font-weight: bold;
+        user-select: none;
+    }
 
 }

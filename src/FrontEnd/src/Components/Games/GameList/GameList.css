@@ -1,10 +1,8 @@
 /* General container */
 .game-list-container {
     padding: 20px;
-    max-width: 1200px;
+    max-width: 90%;
     margin: 0 auto;
-    width: 90%;
-    border-radius: 10px;
   }
   
   /* Title styling */
@@ -83,7 +81,7 @@
     transition: transform 0.3s ease-in-out;
   }
   .game-card-image:hover {
-    transform: scale(1.05);
+    transform: scale(1.01);
   }
   .game-card-image img {
     width: 100%;
@@ -309,12 +307,30 @@
     background-color: rgba(0, 0, 0, 0.856);
     color: white;
     padding: 8px;
-    border-radius: 4px;
     pointer-events: none; /* Avoid blocking card interaction */
   }
   
   .game-card:hover .game-card-tooltip {
     display: block;
+  }
+  
+  
+
+  .game-card-title{
+    transition: font-size 0.5s ease;
+  }
+  
+  @media (max-width: 1175px) {
+    .game-card-title {
+      font-size: 1.3rem;
+    }
+  }
+  
+    
+  @media (max-width: 900px) {
+    .game-card-title {
+      font-size: 1.2rem;
+    }
   }
   
   /* Responsive styling */
@@ -324,11 +340,10 @@
     }
   
     .game-card-image {
-      height: 200px;
+      height: 300px;
     }
   
     .game-card-title {
-      font-size: 1.2rem;
+      font-size: 1.9rem;
     }
   }
-  

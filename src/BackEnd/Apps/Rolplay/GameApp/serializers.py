@@ -5,7 +5,16 @@ from .models import Game, Note, Diary, DiaryEntry
 class DiaryEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = DiaryEntry
-        fields = ['id', 'name', 'description','diary','image1','image2','image3']
+        fields = ['id', 'name', 'description', 'diary', 'image1', 'image2', 'image3']
+
+    def update(self, instance, validated_data):
+        # Si la imagen NO se envía en la petición, mantener la anterior.
+        for field in ['image1', 'image2', 'image3']:
+            if field not in validated_data:
+                validated_data[field] = getattr(instance, field)
+
+        return super().update(instance, validated_data)
+
 
 #---------------------DIARY SERIALIZER---------------------
 class DiarySerializer(serializers.ModelSerializer):
@@ -19,7 +28,7 @@ class DiarySerializer(serializers.ModelSerializer):
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ['id', 'name', 'description', 'type','game']
+        fields = ['id', 'name', 'description', 'type','game','image1', 'image2', 'image3']
 
 #---------------------GAME SERIALIZER---------------------
 class GameSerializer(serializers.ModelSerializer):

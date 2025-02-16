@@ -268,15 +268,18 @@ export default function DiaryEntryList() {
   const handleEditEntry = async () => {
     const token = localStorage.getItem('access');
     const formData = new FormData();
+    
     formData.append('name', editEntry.name);
     formData.append('description', editEntry.description);
     formData.append('diary', id);
-
-    // Solo añadir las imágenes si han sido modificadas
-    if (editEntry.image1) formData.append('image1', editEntry.image1);
-    if (editEntry.image2) formData.append('image2', editEntry.image2);
-    if (editEntry.image3) formData.append('image3', editEntry.image3);
-
+  
+    // Si la imagen es un archivo, la enviamos. Si no, no la agregamos a FormData.
+    if (editEntry.image1 instanceof File) formData.append('image1', editEntry.image1);
+    if (editEntry.image2 instanceof File) formData.append('image2', editEntry.image2);
+    if (editEntry.image3 instanceof File) formData.append('image3', editEntry.image3);
+  
+    console.log("Datos enviados:", [...formData.entries()]);  // Verificar qué se envía
+  
     try {
       const response = await fetch(`${BASE_API_URL}/api/gameApp/diaryentries/${editEntry.id}/`, {
         method: 'PUT',
@@ -285,21 +288,23 @@ export default function DiaryEntryList() {
         },
         body: formData,
       });
-
+  
       if (!response.ok) {
         throw new Error('Error al actualizar el diario');
       }
-
+  
       const updatedEntry = await response.json();
       setEntries(prevState =>
         prevState.map(entry => (entry.id === updatedEntry.id ? updatedEntry : entry))
       );
       setShowEditModal(false);
-      setEditEntry(null);  // Limpiar el estado después de la actualización
+      setEditEntry(null);
     } catch (error) {
       console.error('Error al actualizar:', error);
     }
   };
+  
+  
 
   //#endregion 
 
@@ -454,6 +459,31 @@ export default function DiaryEntryList() {
                 />
               </label>
 
+              {/* Manejo de imágenes con vista previa */}
+              {[1, 2, 3].map((num) => (
+                <label key={num}>
+                  Imagen {num}:
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setEditEntry((prev) => ({
+                          ...prev,
+                          [`image${num}`]: file,
+                        }));
+                      }
+                    }}
+                  />
+                  {editEntry[`image${num}`] && (
+                    <div>
+                      <img className="image-preview" src={editEntry[`image${num}`] instanceof File ? URL.createObjectURL(editEntry[`image${num}`]) : editEntry[`image${num}`]} alt={`Preview ${num}`} />
+                    </div>
+                  )}
+                </label>
+              ))}
+
               <div className="modal-buttons">
                 <button type="submit">Actualizar</button>
                 <button type="button" onClick={() => setShowEditModal(false)}>Cancelar</button>
@@ -462,6 +492,7 @@ export default function DiaryEntryList() {
           </div>
         </div>
       )}
+
 
       {showEntryModal && selectedEntry && (
         <div className="modal-overlay" onClick={handleCloseModal}>

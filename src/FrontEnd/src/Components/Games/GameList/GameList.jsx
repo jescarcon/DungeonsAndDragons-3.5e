@@ -384,7 +384,6 @@ export default function GameList() {
                   name="description"
                   value={editingGame.description}
                   onChange={handleEditChange}
-                  required
                   maxLength="60"
                   placeholder='La historia de 8 bravos guerreros que salvaron el mundo.'
                 
