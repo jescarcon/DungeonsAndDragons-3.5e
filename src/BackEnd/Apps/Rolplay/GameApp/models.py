@@ -102,7 +102,19 @@ class Note(models.Model):
     def delete(self, *args, **kwargs):
         delete_image(self.image1, self.image2, self.image3)
         super().delete(*args, **kwargs)
+    
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old_instance = Note.objects.get(pk=self.pk)
 
+            for field in ['image1', 'image2', 'image3']:
+                old_image = getattr(old_instance, field)
+                new_image = getattr(self, field)
+
+                if old_image and old_image != new_image:
+                    delete_image(old_image)
+
+        super().save(*args, **kwargs)
 
 class Diary(models.Model):
     name = models.CharField(max_length=30, blank=True, null=True)

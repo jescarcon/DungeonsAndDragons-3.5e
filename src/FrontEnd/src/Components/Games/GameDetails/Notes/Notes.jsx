@@ -26,7 +26,7 @@ export default function Notes() {
     visible: false,
     x: 0,
     y: 0,
-    noteId: null, // Identificador de la nota asociada
+    note: null, // Identificador de la nota asociada
   });
 
   const [page, setPage] = useState({
@@ -102,18 +102,18 @@ export default function Notes() {
     }));
   };
 
-  const handleContextMenu = (event, noteId) => {
+  const handleContextMenu = (event, note) => {
     event.preventDefault(); // Evitar el menú contextual predeterminado del navegador
     setContextMenu({
       visible: true,
       x: event.clientX,
       y: event.clientY,
-      noteId, // Guarda el ID de la nota asociada
+      note, // Guarda el ID de la nota asociada
     });
   };
 
   const handleCloseContextMenu = () => {
-    setContextMenu({ visible: false, x: 0, y: 0, noteId: null });
+    setContextMenu({ visible: false, x: 0, y: 0, note: null });
   };
 
   const renderTabContent = (type, bgColor) => {
@@ -158,7 +158,7 @@ export default function Notes() {
                   <div
                     key={note.id}
                     className="note-card"
-                    onContextMenu={(event) => handleContextMenu(event, note.id)} // Maneja el menú contextual aquí
+                    onContextMenu={(event) => handleContextMenu(event, note)} // Maneja el menú contextual aquí
                   >
                     <h3>{note.name}</h3>
                     <p>{note.description}</p>
@@ -303,48 +303,50 @@ export default function Notes() {
     }
   };
 
-  const handleEditNote = async () => {
-    const token = localStorage.getItem('access');
-    const formData = new FormData();
-    formData.append('name', editNotes.name);
-    formData.append('description', editNotes.description);
-    formData.append('game', pk);
-
-    // Solo añadir las imágenes si han sido modificadas
-    if (editNotes.image1) formData.append('image1', editNotes.image1);
-    if (editNotes.image2) formData.append('image2', editNotes.image2);
-    if (editNotes.image3) formData.append('image3', editNotes.image3);
-
-    try {
-      const response = await fetch(`${BASE_API_URL}/api/gameApp/notes/${editNotes.id}/`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al actualizar la nota');
+    const handleEditNote = async () => {
+      const token = localStorage.getItem('access');
+      const formData = new FormData();
+      
+      formData.append('name', editNotes.name);
+      formData.append('description', editNotes.description);
+      formData.append('game', pk);
+    
+      // Si la imagen es un archivo, la enviamos. Si no, no la agregamos a FormData.
+      if (editNotes.image1 instanceof File) formData.append('image1', editNotes.image1);
+      if (editNotes.image2 instanceof File) formData.append('image2', editNotes.image2);
+      if (editNotes.image3 instanceof File) formData.append('image3', editNotes.image3);
+       
+      try {
+        const response = await fetch(`${BASE_API_URL}/api/gameApp/notes/${editNotes.id}/`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+        });
+    
+        if (!response.ok) {
+          throw new Error('Error al actualizar la nota');
+        }
+    
+        const updatedNote = await response.json();
+        setNotes(prevState =>
+          prevState.map(note => (note.id === updatedNote.id ? updatedNote : note))
+        );
+        setShowEditModal(false);
+        setEditNotes(null);
+      } catch (error) {
+        console.error('Error al actualizar:', error);
       }
-
-      const updatedNote = await response.json();
-      setNotes(prevState =>
-        prevState.map(note => (note.id === updatedNote.id ? updatedNote : entry))
-      );
-      setShowEditModal(false);
-      setEditNotes(null);  // Limpiar el estado después de la actualización
-    } catch (error) {
-      console.error('Error al actualizar:', error);
-    }
-  };
+    };
+  
   const handleEditNoteClick = (note) => {
     setEditNotes({
       id: note.id,
       name: note.name,
       description: note.description,
-      type:note.type,
-      game:pk,
+      type: note.type,
+      game: pk,
       image1: note.image1 || null,
       image2: note.image2 || null,
       image3: note.image3 || null,
@@ -424,8 +426,8 @@ export default function Notes() {
 
       {contextMenu && contextMenu.visible && (
         <div className="context-menu" style={{ top: contextMenu.y, left: contextMenu.x }}>
-          <button onClick={() => handleEditNoteClick(contextMenu)}>Editar</button>
-          <button onClick={() => handleDelete(contextMenu.noteId)}>Eliminar</button>
+          <button onClick={() => handleEditNoteClick(contextMenu.note)}>Editar</button>
+          <button onClick={() => handleDelete(contextMenu.note.id)}>Eliminar</button>
         </div>
       )}
 
@@ -535,6 +537,30 @@ export default function Notes() {
                   onChange={(e) => setEditNotes({ ...editNotes, description: e.target.value })}
                 />
               </label>
+              {/* Manejo de imágenes con vista previa */}
+              {[1, 2, 3].map((num) => (
+                <label key={num}>
+                  Imagen {num}:
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setEditNotes((prev) => ({
+                          ...prev,
+                          [`image${num}`]: file,
+                        }));
+                      }
+                    }}
+                  />
+                  {editNotes[`image${num}`] && (
+                    <div>
+                      <img className="image-preview" src={editNotes[`image${num}`] instanceof File ? URL.createObjectURL(editNotes[`image${num}`]) : editNotes[`image${num}`]} alt={`Preview ${num}`} />
+                    </div>
+                  )}
+                </label>
+              ))}
 
               <div className="modal-buttons">
                 <button type="submit">Actualizar</button>

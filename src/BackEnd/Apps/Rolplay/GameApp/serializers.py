@@ -30,6 +30,14 @@ class NoteSerializer(serializers.ModelSerializer):
         model = Note
         fields = ['id', 'name', 'description', 'type','game','image1', 'image2', 'image3']
 
+    def update(self, instance, validated_data):
+        # Si la imagen NO se envía en la petición, mantener la anterior.
+        for field in ['image1', 'image2', 'image3']:
+            if field not in validated_data:
+                validated_data[field] = getattr(instance, field)
+
+        return super().update(instance, validated_data)
+    
 #---------------------GAME SERIALIZER---------------------
 class GameSerializer(serializers.ModelSerializer):
     notes = NoteSerializer(many=True, read_only=True)  
