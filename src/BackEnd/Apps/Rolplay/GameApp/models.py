@@ -91,13 +91,14 @@ class Note(models.Model):
         ('Nota', 'Nota'),
     ]
 
-    name = models.CharField(max_length=30, blank=True, null=True)
-    description = models.CharField(max_length=500, blank=True, null=True)
+    name = models.CharField(max_length=100, blank=True, null=True)
+    description = models.TextField( blank=True, null=True)
     image1 = models.ImageField(upload_to='images/rolplay/games_app/notes/', blank=True, null=True)
     image2 = models.ImageField(upload_to='images/rolplay/games_app/notes/', blank=True, null=True)
     image3 = models.ImageField(upload_to='images/rolplay/games_app/notes/', blank=True, null=True)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='Nota')
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='notes')  # Game Relation
+    completed=models.BooleanField(default=False)
 
     def delete(self, *args, **kwargs):
         delete_image(self.image1, self.image2, self.image3)

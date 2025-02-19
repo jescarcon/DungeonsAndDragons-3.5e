@@ -1,10 +1,15 @@
 /* Contenedor general */
 .notes-container {
-    width: 80%;
+    width: 90%;
     margin: 0 auto;
     border-radius: 8px;
     margin-top: 2%;
     user-select: none;
+    min-height: 900px;
+}
+.Notes-add-icon {
+    width: 40px; /* Ajusta el tamaño según lo necesites */
+    height: 40px; /* Mantén la relación de aspecto, si es necesario */
 }
 
 /* Contenedor de las pestañas */
@@ -13,102 +18,166 @@
     cursor: pointer;
     border-radius: 8px 8px 0 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;  /* Evita la barra de desplazamiento */
-
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
 }
 
-.tab-content {}
+/* Estilos para scrollbar en navegadores WebKit */
+.tab-container::-webkit-scrollbar {
+    height: 8px;
+}
 
+.tab-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.tab-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.tab-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Estilos de pestañas */
 .tab {
-    padding: 12px 16px;
+    padding: 17px 21px;
     text-align: center;
     transition: background-color 0.3s ease, transform 0.3s ease;
     cursor: pointer;
     border-radius: 8px 8px 0 0;
     font-weight: bold;
     user-select: none;
-    width: 100%;
+    flex-grow: 1;
+    text-wrap: nowrap;
+}
 
-}
-.entries-header{
+.entries-header {
     margin-top: 1%;
-    margin-bottom: 1%;
+    margin-bottom: 2%;
 }
-.noteList-container{
-    min-height: 370px;
-}
+
+/* Contenido general */
 .content {
-    padding: 10px;
-    margin-bottom: 1%;
-    min-height: 500px;
+    padding: 30px;
+    min-height: 840px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Distribuye los elementos */
+    justify-content: space-between;
 }
-.pagination{
-}
-.note-card {
-    width: 98%;
+
+.noteList-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
     margin: 0 auto;
-    margin-bottom: 1%;
-    background-color: #ffffff84;
-    border-radius: 3px;
-    padding: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.318);
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    margin-bottom: 2%;
 }
 
+/* Tarjetas de notas */
+.note-card {
+    width: 30%;
+    aspect-ratio: 1;
+    /* Mantiene la proporción cuadrada */
+    background-color: #f7e85ed8;
+    border-radius: 5px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.459);
+    transition: transform 0.2s ease;
+    text-align: center;
+    font-weight: bold;
+    font-family: 'Arial', sans-serif;
+    transform: rotate(-2deg);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
 
-@media (min-width: 500px) {
+}
 
-    /* Contenedor de las pestañas */
-    .tab-container {
-        display: flex;
-        cursor: pointer;
-        border-radius: 8px 8px 0 0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Efecto al pasar el mouse */
+.note-card:hover {
+    transform: rotate(0deg) scale(1.05);
+}
+
+/* Icono de pin */
+.pin-icon {
+    width: 55px;
+    cursor: pointer;
+    margin-top: 20%;
+}
+
+.notename {
+    width: 90%;
+    overflow: hidden;
+    margin-top: 5%;
+    font-size: 2rem;
+    cursor: pointer;
+
+}
+.completed {
+    text-decoration: line-through;
+}
+  
+
+/* 📱 RESPONSIVE DESIGN */
+
+/* 📏 Para pantallas medianas (tablets, < 1024px) */
+@media (max-width: 1424px) {
+    .notes-container {
+        width: 95%;
+    }
+
+    .noteList-container {
+        gap: 20px;
+    }
+
+    .note-card {
+        width: 45%;
+        transform: rotate(-1deg);
+    }
+}
+
+/* 📏 Para pantallas pequeñas (móviles, < 768px) */
+@media (max-width: 768px) {
+    .notes-container {
         width: 100%;
-        /* Asegura que el contenedor ocupe todo el ancho disponible */
-        white-space: nowrap;
-        /* Evita que las pestañas se envuelvan en varias filas */
-        overflow-x: auto;
-        /* Permite desplazarse horizontalmente si las pestañas se desbordan */
-        overflow-y: hidden;
-        /* Elimina el desplazamiento vertical */
-
     }
 
-    /* Barra de desplazamiento horizontal */
-    .tab-container::-webkit-scrollbar {
-        height: 8px;
-        /* Altura de la barra de desplazamiento */
+    .tab-container {
+        font-size: 14px;
     }
-
-    .tab-container::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        /* Color de fondo de la pista de la barra */
-    }
-
-    .tab-container::-webkit-scrollbar-thumb {
-        background: #888;
-        /* Color del "dedo" de la barra de desplazamiento */
-        border-radius: 10px;
-    }
-
-    .tab-container::-webkit-scrollbar-thumb:hover {
-        background: #555;
-        /* Color al pasar el ratón sobre la barra de desplazamiento */
-    }
-
-    /* Estilo para cada pestaña */
     .tab {
         padding: 12px 16px;
-        text-align: center;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-        cursor: pointer;
-        border-radius: 8px 8px 0 0;
-        font-weight: bold;
-        user-select: none;
+        
+    }
+    .note-card {
+        width: 80%; /* Ajuste para que las notas sean un poco más grandes en móviles */
+        display: flex;
+        flex-direction: column; /* Apilamos los elementos verticalmente */
+        padding: 10px;
     }
 
+    .pin-icon {
+        width: 30px;
+        margin-bottom: 5px; /* Espacio entre el pin y el nombre */
+    }
+
+    .notename {
+        font-size: 1.5rem;
+        text-align: center;
+        margin-top: 0;
+    }
+
+    /* Estilo para la lista de las notas */
+    .note-card {
+        border-bottom: 1px solid #ddd; /* Línea de separación entre notas */
+        margin-bottom: 15px; /* Espacio entre cada elemento */
+        padding-bottom: 10px; /* Relleno en la parte inferior de la tarjeta */
+    }
 }

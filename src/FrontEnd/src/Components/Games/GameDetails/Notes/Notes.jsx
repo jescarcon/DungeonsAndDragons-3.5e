@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { BASE_API_URL } from '../../../constants';
 import Añadir from '/Common/añadir_negro.png';
+import Pin from '/Character/Note/pin.png';
 import './Notes.css';
 
 export default function Notes() {
@@ -20,6 +21,7 @@ export default function Notes() {
     imagePreview1: null,
     imagePreview2: null,
     imagePreview3: null,
+    completed: false,
   });
   const [loading, setLoading] = useState(true);
   const [contextMenu, setContextMenu] = useState({
@@ -36,7 +38,7 @@ export default function Notes() {
     Bestiario: 1,
     Notas: 1,
   });
-  const itemsPerPage = 5;
+  const itemsPerPage = 6;
 
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false); // Estado para manejar el modal de edición
@@ -57,6 +59,9 @@ export default function Notes() {
     const { name, value } = e.target;
     setNewNote((prev) => ({ ...prev, [name]: value }));
   };
+  const [showNoteModal, setShowNoteModal] = useState(false);
+  const [selectedNote, setSelectedNote] = useState(null);
+  const [zoomedImage, setZoomedImage] = useState(null);
 
   //#endregion 
 
@@ -134,7 +139,7 @@ export default function Notes() {
       <div className="content" style={{ backgroundColor: bgColor }}>
         {loading ? (
           <div>Cargando notas...</div>
-        ) : (
+        ) : (<>
           <div>
             {/* Botón para añadir una nota */}
             <div className="entries-header">
@@ -144,7 +149,7 @@ export default function Notes() {
                 title="Añadir una nota"
               >
                 <div className="Notes-add-button">
-                  <img src={Añadir} alt="Añadir" className="add-icon" />
+                  <img src={Añadir} alt="Añadir" className="Notes-add-icon" />
                 </div>
               </button>
             </div>
@@ -159,35 +164,39 @@ export default function Notes() {
                     key={note.id}
                     className="note-card"
                     onContextMenu={(event) => handleContextMenu(event, note)} // Maneja el menú contextual aquí
+
                   >
-                    <h3>{note.name}</h3>
-                    <p>{note.description}</p>
+                    <div >
+                      <img className="pin-icon" onClick={() => handleCompleteNote(note)} src={Pin} alt="Pin" />
+                    </div>
+                    <div className={`notename ${note.completed ? 'completed' : ''}`} onClick={() => handleOpenNoteModal(note)}><h3>{note.name}</h3></div>
                   </div>
                 ))
               )}
             </div>
 
-            {/* Paginación */}
-            {filteredNotes.length > itemsPerPage && (
-              <div className="pagination">
-                <button
-                  onClick={() => handlePageChange(activeTab, -1)}
-                  disabled={currentPage === 1}
-                >
-                  Anterior
-                </button>
-                <span>
-                  Página {currentPage} de {totalPages}
-                </span>
-                <button
-                  onClick={() => handlePageChange(activeTab, 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  Siguiente
-                </button>
-              </div>
-            )}
+
           </div>
+          {/* Paginación */}
+          {filteredNotes.length > itemsPerPage && (
+            <div className="pagination">
+              <button
+                onClick={() => handlePageChange(activeTab, -1)}
+                disabled={currentPage === 1}
+              >
+                Anterior
+              </button>
+              <span>
+                Página {currentPage} de {totalPages}
+              </span>
+              <button
+                onClick={() => handlePageChange(activeTab, 1)}
+                disabled={currentPage === totalPages}
+              >
+                Siguiente
+              </button>
+            </div>
+          )}</>
         )}
       </div>
     );
@@ -206,6 +215,56 @@ export default function Notes() {
     }
   };
 
+
+  // Función para abrir el modal y seleccionar la nota
+  const handleOpenNoteModal = (note) => {
+    setSelectedNote(note);
+    setShowNoteModal(true);
+  };
+
+  // Función para cerrar el modal
+  const handleCloseNoteModal = () => {
+    setShowNoteModal(false);
+    setSelectedNote(null);
+  };
+
+  const handleCompleteNote = async (note) => {
+    // Alternar el estado de 'completed'
+    const updatedNote = {
+      ...note,
+      completed: !note.completed,
+    };
+
+    const token = localStorage.getItem('access');
+
+    try {
+      // Usar 'PATCH' para actualizar solo el campo 'completed'
+      const response = await fetch(`${BASE_API_URL}/api/gameApp/notes/${note.id}/`, {
+        method: 'PATCH',  // Usamos PATCH para actualización parcial
+        headers: {
+          'Content-Type': 'application/json',  // Indicamos que estamos enviando datos JSON
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          completed: updatedNote.completed,  // Solo enviamos el campo 'completed'
+        }),
+      });
+
+      if (response.ok) {
+        const updatedNoteData = await response.json();
+        // Actualiza la lista de notas para reflejar el cambio
+        setNotes((prevNotes) =>
+          prevNotes.map((n) =>
+            n.id === updatedNoteData.id ? updatedNoteData : n
+          )
+        );
+      } else {
+        console.error('Error al actualizar la nota');
+      }
+    } catch (error) {
+      console.error('Error al completar la nota:', error);
+    }
+  };
 
 
   //#endregion
@@ -303,43 +362,44 @@ export default function Notes() {
     }
   };
 
-    const handleEditNote = async () => {
-      const token = localStorage.getItem('access');
-      const formData = new FormData();
-      
-      formData.append('name', editNotes.name);
-      formData.append('description', editNotes.description);
-      formData.append('game', pk);
-    
-      // Si la imagen es un archivo, la enviamos. Si no, no la agregamos a FormData.
-      if (editNotes.image1 instanceof File) formData.append('image1', editNotes.image1);
-      if (editNotes.image2 instanceof File) formData.append('image2', editNotes.image2);
-      if (editNotes.image3 instanceof File) formData.append('image3', editNotes.image3);
-       
-      try {
-        const response = await fetch(`${BASE_API_URL}/api/gameApp/notes/${editNotes.id}/`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-          body: formData,
-        });
-    
-        if (!response.ok) {
-          throw new Error('Error al actualizar la nota');
-        }
-    
-        const updatedNote = await response.json();
-        setNotes(prevState =>
-          prevState.map(note => (note.id === updatedNote.id ? updatedNote : note))
-        );
-        setShowEditModal(false);
-        setEditNotes(null);
-      } catch (error) {
-        console.error('Error al actualizar:', error);
+  const handleEditNote = async () => {
+    const token = localStorage.getItem('access');
+    const formData = new FormData();
+
+    formData.append('name', editNotes.name);
+    formData.append('description', editNotes.description);
+    formData.append('game', pk);
+    formData.append('completed', editNotes.completed);
+
+    // Si la imagen es un archivo, la enviamos. Si no, no la agregamos a FormData.
+    if (editNotes.image1 instanceof File) formData.append('image1', editNotes.image1);
+    if (editNotes.image2 instanceof File) formData.append('image2', editNotes.image2);
+    if (editNotes.image3 instanceof File) formData.append('image3', editNotes.image3);
+
+    try {
+      const response = await fetch(`${BASE_API_URL}/api/gameApp/notes/${editNotes.id}/`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al actualizar la nota');
       }
-    };
-  
+
+      const updatedNote = await response.json();
+      setNotes(prevState =>
+        prevState.map(note => (note.id === updatedNote.id ? updatedNote : note))
+      );
+      setShowEditModal(false);
+      setEditNotes(null);
+    } catch (error) {
+      console.error('Error al actualizar:', error);
+    }
+  };
+
   const handleEditNoteClick = (note) => {
     setEditNotes({
       id: note.id,
@@ -353,6 +413,7 @@ export default function Notes() {
       imagePreview1: note.image1 ? `${BASE_API_URL}${note.image1}` : null,
       imagePreview2: note.image2 ? `${BASE_API_URL}${note.image2}` : null,
       imagePreview3: note.image3 ? `${BASE_API_URL}${note.image3}` : null,
+      completed:note.completed,
     });
     setShowEditModal(true);
   };
@@ -430,7 +491,6 @@ export default function Notes() {
           <button onClick={() => handleDelete(contextMenu.note.id)}>Eliminar</button>
         </div>
       )}
-
       {showModal && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -446,7 +506,7 @@ export default function Notes() {
                   onChange={handleInputChange}
                   required
                   placeholder='Rescatar a los civiles del incendio.'
-                  maxLength={30}
+                  maxLength={100}
                 />
               </label>
 
@@ -457,7 +517,7 @@ export default function Notes() {
                   value={newNote.description}
                   onChange={handleInputChange}
                   placeholder='Debemos ir a comprobar que todos estan a salvo.'
-                  maxLength={500}
+
                 />
               </label>
               <label>
@@ -501,9 +561,7 @@ export default function Notes() {
                   </div>
                 )}
               </label>
-
             </form>
-
             <div className="modal-buttons">
               <button type="submit" onClick={handleCreateNote}>Guardar</button>
               <button type="button" onClick={closeModal}>Cancelar</button>
@@ -532,7 +590,6 @@ export default function Notes() {
                 Descripción:
                 <textarea
                   value={editNotes.description}
-                  maxLength={300}
                   placeholder='Amanece un nuevo día en la ciudad de Escarlia...'
                   onChange={(e) => setEditNotes({ ...editNotes, description: e.target.value })}
                 />
@@ -570,6 +627,50 @@ export default function Notes() {
           </div>
         </div>
       )}
+
+      {showNoteModal && selectedNote && (
+        <div className="modal-overlay" onClick={handleCloseNoteModal}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={handleCloseNoteModal}>×</button>
+            <h2>{selectedNote.name}</h2>
+            <div className="note-detail-description">
+              <p>{selectedNote.description}</p>
+            </div>
+            <div className="image-container">
+              {selectedNote.image1 && (
+                <img
+                  src={selectedNote.image1}
+                  alt="Imagen 1"
+                  onClick={() => setZoomedImage(selectedNote.image1)}
+                />
+              )}
+              {selectedNote.image2 && (
+                <img
+                  src={selectedNote.image2}
+                  alt="Imagen 2"
+                  onClick={() => setZoomedImage(selectedNote.image2)}
+                />
+              )}
+              {selectedNote.image3 && (
+                <img
+                  src={selectedNote.image3}
+                  alt="Imagen 3"
+                  onClick={() => setZoomedImage(selectedNote.image3)}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {zoomedImage && (
+        <div className="zoomed-image-overlay" onClick={() => setZoomedImage(null)}>
+          <div className="zoomed-image-container">
+            <img src={zoomedImage} alt="Imagen ampliada" className="zoomed-image" />
+          </div>
+        </div>
+      )}
+
     </div>
   );
 

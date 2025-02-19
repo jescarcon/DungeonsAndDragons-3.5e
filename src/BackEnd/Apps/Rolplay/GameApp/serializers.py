@@ -28,7 +28,7 @@ class DiarySerializer(serializers.ModelSerializer):
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = ['id', 'name', 'description', 'type','game','image1', 'image2', 'image3']
+        fields = ['id', 'name', 'description', 'type','game','image1', 'image2', 'image3','completed']
 
     def update(self, instance, validated_data):
         # Si la imagen NO se envía en la petición, mantener la anterior.
