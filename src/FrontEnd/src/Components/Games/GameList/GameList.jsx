@@ -297,9 +297,11 @@ export default function GameList() {
                   ) : (
                     <div className="game-card-placeholder"></div>
                   )}
-                  <div className="game-card-tooltip">{game.description}</div>
+                  <div className="game-card-tooltip">
+                    <div className="game-card-tooltip-text">{game.description}</div>
+                  </div>
+                  <div className="game-card-title">{game.name}</div>
                 </div>
-                <div className="game-card-title">{game.name}</div>
               </Link>
             </div>
           ))

@@ -54,9 +54,9 @@ def delete_image(*image_fields, default_images=None):
 # --------------------- MODELOS ---------------------
 
 class Game(models.Model):
-    name = models.CharField(max_length=100, blank=True, null=True)
+    name = models.CharField(max_length=30, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # User Relation
-    description = models.CharField(max_length=100, blank=True, null=True)
+    description = models.CharField(max_length=60, blank=True, null=True)
     image = models.ImageField(upload_to='images/rolplay/games_app/games/', blank=True, null=True, default=get_random_default_game_image)
 
     def delete(self, *args, **kwargs):
@@ -80,7 +80,6 @@ class Game(models.Model):
                 delete_image(old_instance.image, default_images=DEFAULT_GAME_IMAGES)
 
         super().save(*args, **kwargs)
-
 
 class Note(models.Model):
     TYPE_CHOICES = [
@@ -119,7 +118,7 @@ class Note(models.Model):
 
 class Diary(models.Model):
     name = models.CharField(max_length=30, blank=True, null=True)
-    description = models.CharField(max_length=500, blank=True, null=True)
+    description = models.CharField(max_length=60, blank=True, null=True)
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='diaries')  # Game Relation
     image = models.ImageField(upload_to='images/rolplay/games_app/diary/', blank=True, null=True, default=get_random_default_diary_image)
 
@@ -140,7 +139,6 @@ class Diary(models.Model):
                 delete_image(old_instance.image, default_images=DEFAULT_DIARY_IMAGES)
 
         super().save(*args, **kwargs)
-
 
 class DiaryEntry(models.Model):
     name = models.CharField(max_length=100, blank=True, null=True)

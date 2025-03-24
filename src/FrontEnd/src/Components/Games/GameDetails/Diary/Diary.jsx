@@ -241,7 +241,11 @@ export default function Diary() {
                 <img src={diary.image} alt="Diario" className='diary-image' />
                 <div className='diary-name'>{diary.name}</div>
                 <div className='diary-overlay'>
-                  <div className='diary-description'>{diary.description}</div>
+                  <div className='diary-description'>
+                    <div className='diary-description-text'>
+                      {diary.description}
+                    </div>
+                  </div>
                 </div>
               </Link>
             </div>
@@ -277,13 +281,13 @@ export default function Diary() {
                   onChange={(e) => setNewDiary({ ...newDiary, name: e.target.value })}
                   required
                   placeholder='Diario de Nathaniel'
-                  maxLength={30}
+                  maxLength="30"
                 />
               </label>
               <label>
                 Descripción:
                 <textarea
-                  maxLength={50}
+                  maxLength="60"
                   value={newDiary.description}
                   placeholder='Viejo cuaderno de cuero algo raído, contiene dibujos y anotaciones...'
                   onChange={(e) => setNewDiary({ ...newDiary, description: e.target.value })}
@@ -326,6 +330,7 @@ export default function Diary() {
                   onChange={(e) => setEditDiary({ ...editDiary, name: e.target.value })}
                   required
                   placeholder='Diario de Nathaniel'
+                  maxLength="30"
                 />
               </label>
               <label>
@@ -334,6 +339,8 @@ export default function Diary() {
                   value={editDiary.description}
                   placeholder='Viejo cuaderno de cuero algo raído, contiene dibujos y anotaciones...'
                   onChange={(e) => setEditDiary({ ...editDiary, description: e.target.value })}
+                  maxLength="60"
+
                 />
               </label>
               <label>

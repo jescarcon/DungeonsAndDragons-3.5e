@@ -29,7 +29,6 @@
   padding: 10px;
   padding-top: 40px;
   padding-bottom: 40px;
-
 }
 .entries-item {
   display: flex;
@@ -43,12 +42,16 @@
   background: #c0c0c0;
   cursor: pointer;
   transition: background 0.3s;
+
 }
 
 .entries-name {
   font-size: 1rem;
   color: #333;
   padding-left:10px ;
+  white-space: normal; 
+  max-width: 88%; 
+  word-wrap: break-word; 
 }
 .entries-item a {
   text-decoration: none;
@@ -64,18 +67,31 @@
   object-fit: cover;
   flex-shrink: 0;
 }
-
+.create-diary-entry-description{
+  height: 100px;
+}
+.edit-diaryEntry-description{
+  height: 100px;
+}
 .noEntriesList{
   text-align: center;
-  user-select: none;
 }
 
 .modal-close{
   user-select: none;
 }
 .entry-detail-description{
-  user-select: none;
+  white-space: normal; 
+  max-width: 90%; 
+  word-wrap: break-word; 
 }
+.entry-detail-name{
+  white-space: normal; 
+  max-width: 90%; 
+  word-wrap: break-word; 
+}
+
+
 .pagination {
   display: flex;
   justify-content: center;

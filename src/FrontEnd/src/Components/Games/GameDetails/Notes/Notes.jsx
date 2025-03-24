@@ -491,6 +491,7 @@ export default function Notes() {
           <button onClick={() => handleDelete(contextMenu.note.id)}>Eliminar</button>
         </div>
       )}
+
       {showModal && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -513,6 +514,7 @@ export default function Notes() {
               <label>
                 Descripción:
                 <textarea
+                  className='note-description'
                   name="description"
                   value={newNote.description}
                   onChange={handleInputChange}
@@ -569,6 +571,7 @@ export default function Notes() {
           </div>
         </div>
       )}
+
       {showEditModal && editNotes && (
         <div className="modal-overlay">
           <div className="modal">
@@ -589,6 +592,7 @@ export default function Notes() {
               <label>
                 Descripción:
                 <textarea
+                  className='note-description'
                   value={editNotes.description}
                   placeholder='Amanece un nuevo día en la ciudad de Escarlia...'
                   onChange={(e) => setEditNotes({ ...editNotes, description: e.target.value })}
@@ -632,7 +636,7 @@ export default function Notes() {
         <div className="modal-overlay" onClick={handleCloseNoteModal}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" onClick={handleCloseNoteModal}>×</button>
-            <h2>{selectedNote.name}</h2>
+            <h2 className='note-detail-name'>{selectedNote.name}</h2>
             <div className="note-detail-description">
               <p>{selectedNote.description}</p>
             </div>

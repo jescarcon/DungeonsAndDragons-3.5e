@@ -1,8 +1,6 @@
 .diary-container {
     padding: 20px;
-    text-align: center;
     user-select: none;
-
   }
   
   .diary-title h1 {
@@ -64,11 +62,18 @@
     font-weight: bold;
     pointer-events: none;
     user-select: none;
+    width: 90%;
+    text-align: center;
+
+    word-break: break-word;
+    white-space: normal;
   }
-  
-  .diary-description {
+
+  .diary-description-text {
     font-size: 14px;
-    margin-top: 10px;  
+    white-space: normal; 
+    max-width: 90%; 
+    word-wrap: break-word; 
   }
   
   .diary-title {

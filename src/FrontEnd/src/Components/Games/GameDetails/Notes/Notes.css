@@ -23,6 +23,7 @@
     white-space: nowrap;
     scrollbar-width: thin;
     scrollbar-color: #888 #f1f1f1;
+    
 }
 
 /* Estilos para scrollbar en navegadores WebKit */
@@ -54,6 +55,7 @@
     user-select: none;
     flex-grow: 1;
     text-wrap: nowrap;
+    
 }
 
 .entries-header {
@@ -68,6 +70,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    
 }
 
 .noteList-container {
@@ -77,11 +80,13 @@
     gap: 30px;
     width: 100%;
     margin: 0 auto;
+
     margin-bottom: 2%;
 }
 
 /* Tarjetas de notas */
 .note-card {
+
     width: 30%;
     aspect-ratio: 1;
     /* Mantiene la proporción cuadrada */
@@ -89,15 +94,30 @@
     border-radius: 5px;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.459);
     transition: transform 0.2s ease;
-    text-align: center;
-    font-weight: bold;
-    font-family: 'Arial', sans-serif;
     transform: rotate(-2deg);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
 
+    text-align: center;
+    font-weight: bold;
+    font-family: 'Arial', sans-serif;
+    word-break: break-word;
+    white-space: normal;
+    
+}
+.notename {
+    width: 90%;
+    height: auto;
+    overflow: hidden;
+    margin-top: 5%;
+    font-size: 2rem;
+    cursor: pointer;
+}
+.note-description{
+    height: 100px;
+      
 }
 
 /* Efecto al pasar el mouse */
@@ -112,35 +132,39 @@
     margin-top: 20%;
 }
 
-.notename {
-    width: 90%;
-    overflow: hidden;
-    margin-top: 5%;
-    font-size: 2rem;
-    cursor: pointer;
 
-}
 .completed {
     text-decoration: line-through;
 }
   
 
-/* 📱 RESPONSIVE DESIGN */
+.note-detail-name{
+    width: 95%;
+    text-align: center;
+    word-break: break-word;
+    white-space: normal;
+}
+.note-detail-description{
+    width: 95%;
+    text-align: center;
+    word-break: break-word;
+    white-space: normal;
+}
+
 
 /* 📏 Para pantallas medianas (tablets, < 1024px) */
 @media (max-width: 1424px) {
-    .notes-container {
-        width: 95%;
-    }
-
-    .noteList-container {
-        gap: 20px;
-    }
-
+  
     .note-card {
-        width: 45%;
-        transform: rotate(-1deg);
+        width: 35%;
     }
+    .notename{
+        font-size: 1rem;
+    }
+    .pin-icon {
+        width: 40px;
+    }
+
 }
 
 /* 📏 Para pantallas pequeñas (móviles, < 768px) */
@@ -149,15 +173,12 @@
         width: 100%;
     }
 
-    .tab-container {
-        font-size: 14px;
-    }
     .tab {
         padding: 12px 16px;
         
     }
     .note-card {
-        width: 80%; /* Ajuste para que las notas sean un poco más grandes en móviles */
+        width: 40%; /* Ajuste para que las notas sean un poco más grandes en móviles */
         display: flex;
         flex-direction: column; /* Apilamos los elementos verticalmente */
         padding: 10px;

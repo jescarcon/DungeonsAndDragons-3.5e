@@ -109,6 +109,8 @@
     text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
     pointer-events: none;
     user-select: none;
+    width: 90%;
+    text-align: center;
 
   }
   
@@ -186,21 +188,27 @@
     border: 1px solid #ccc;
     resize: none;
     }
-    .modal-form input[type="file"]{
-      width: 30%;
-      margin-left: 3%;
-    }
+
     .modal-form input[type="file"]::file-selector-button {
       color: #ffffff; /* Cambia el color del texto */
       border: 1px solid #434343; /* Cambia el borde */
       background-color: #000000d5;
       padding: 8px 16px;
       border-radius: 5px;
-      width: 100%;
       cursor: pointer;
     }
     .modal-form input[type="file"]::file-selector-button:hover{
       background-color: #000000b0;
+    }
+    .modal-form input[type="file"] { 
+      color: transparent;     
+      border: none;
+      outline: none;
+      border: none;
+      outline: none;
+      padding: 0;
+      margin-left: 2%;
+      width: auto;
     }
 
   .image-preview {
@@ -285,7 +293,6 @@
   .image-preview {
     max-width: 100px;
   }
-  input[type="file"] { color: transparent; }
 
   .buttonDeleteImg {
     background-color: #000000;
@@ -303,13 +310,18 @@
 .game-card-tooltip {
     display: none;
     position: absolute;
-    bottom: -1%; /* Position above the card */
+    bottom: -1%; 
     background-color: rgba(0, 0, 0, 0.856);
     color: white;
     padding: 8px;
-    pointer-events: none; /* Avoid blocking card interaction */
+    width: 100%;
   }
-  
+  .game-card-tooltip-text{
+    white-space: normal; 
+    max-width: 90%; 
+    word-wrap: break-word; 
+  }
+
   .game-card:hover .game-card-tooltip {
     display: block;
   }
@@ -320,18 +332,17 @@
     transition: font-size 0.5s ease;
   }
   
-  @media (max-width: 1175px) {
+  @media (max-width: 1440px) {
     .game-card-title {
-      font-size: 1.3rem;
+      font-size: 1.9rem;
+      word-break: break-word;
+      white-space: normal;
+      text-align: center;
+      width: 90%;
+      text-align: center;
     }
   }
   
-    
-  @media (max-width: 900px) {
-    .game-card-title {
-      font-size: 1.2rem;
-    }
-  }
   
   /* Responsive styling */
   @media (max-width: 768px) {

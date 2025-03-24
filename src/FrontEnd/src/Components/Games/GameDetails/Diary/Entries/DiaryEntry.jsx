@@ -369,13 +369,14 @@ export default function DiaryEntryList() {
                   onChange={(e) => setNewEntry({ ...newEntry, name: e.target.value })}
                   required
                   placeholder='Día 1: Comienzo de la aventura'
-                  maxLength={30}
+                  maxLength="100"
                 />
               </label>
               <label>
                 Descripción:
                 <textarea
-                  maxLength={50}
+                  className='create-diary-entry-description'
+                  maxLength="500"
                   value={newEntry.description}
                   placeholder='Amanece un nuevo día en la ciudad de Escarlia...'
                   onChange={(e) => setNewEntry({ ...newEntry, description: e.target.value })}
@@ -436,7 +437,7 @@ export default function DiaryEntryList() {
         <div className="modal-overlay">
           <div className="modal">
             <button className="modal-close" onClick={() => setShowEditModal(false)}>×</button>
-            <h2>Editar Diario</h2>
+            <h2>Editar Entrada del Diario</h2>
             <form onSubmit={(e) => { e.preventDefault(); handleEditEntry(); }} className="modal-form">
               <label>
                 Nombre:
@@ -445,15 +446,15 @@ export default function DiaryEntryList() {
                   value={editEntry.name}
                   onChange={(e) => setEditEntry({ ...editEntry, name: e.target.value })}
                   required
-                  maxLength={100}
+                  maxLength="100"
                   placeholder='Día 1: Comienzo de la aventura'
                 />
               </label>
               <label>
                 Descripción:
-                <textarea
+                <textarea className="edit-diaryEntry-description"
                   value={editEntry.description}
-                  maxLength={300}
+                  maxLength="500"
                   placeholder='Amanece un nuevo día en la ciudad de Escarlia...'
                   onChange={(e) => setEditEntry({ ...editEntry, description: e.target.value })}
                 />
@@ -498,7 +499,7 @@ export default function DiaryEntryList() {
         <div className="modal-overlay" onClick={handleCloseModal}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" onClick={handleCloseModal}>×</button>
-            <h2>{selectedEntry.name}</h2>
+            <h2 className="entry-detail-name" >{selectedEntry.name}</h2>
             <div className="entry-detail-description"><p>{selectedEntry.description}</p></div>
             <div className="image-container">
               {selectedEntry.image1 && (
