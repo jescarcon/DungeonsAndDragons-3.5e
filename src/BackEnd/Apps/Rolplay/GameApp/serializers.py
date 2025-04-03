@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Game, Note, Diary, DiaryEntry
+from .models import Game, Note, Diary, DiaryEntry,Character
 
 #---------------------DIARY ENTRY SERIALIZER---------------------
 class DiaryEntrySerializer(serializers.ModelSerializer):
@@ -47,3 +47,18 @@ class GameSerializer(serializers.ModelSerializer):
         model = Game
         fields = ['id', 'name', 'description', 'image', 'notes', 'diaries','user']
 
+#---------------------GAME SERIALIZER---------------------
+class CharacterSerializer(serializers.ModelSerializer):
+    game = serializers.PrimaryKeyRelatedField(queryset=Game.objects.all())
+
+    class Meta:
+        model = Character
+        fields = ['id', 'name', 'game', 'image', 'excel_file']
+
+    def update(self, instance, validated_data):
+        # Si la imagen o el archivo Excel NO se envían en la petición, mantener los anteriores.
+        for field in ['image', 'excel_file']:
+            if field not in validated_data:
+                validated_data[field] = getattr(instance, field)
+
+        return super().update(instance, validated_data)

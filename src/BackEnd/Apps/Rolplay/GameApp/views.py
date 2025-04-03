@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from .models import Game, Note, Diary, DiaryEntry
-from .serializers import GameSerializer, NoteSerializer, DiarySerializer, DiaryEntrySerializer
+from .models import Character, Game, Note, Diary, DiaryEntry
+from .serializers import CharacterSerializer, GameSerializer, NoteSerializer, DiarySerializer, DiaryEntrySerializer
 from rest_framework.permissions import IsAuthenticated
 
     # Django Rest Framework creates CRUD
@@ -27,4 +27,10 @@ class DiaryViewSet(viewsets.ModelViewSet):
 class DiaryEntryViewSet(viewsets.ModelViewSet):
     queryset = DiaryEntry.objects.all()
     serializer_class = DiaryEntrySerializer
+
+
+#---------------------CHARACTER VIEWSET---------------------
+class CharacterViewSet(viewsets.ModelViewSet):
+    queryset = Character.objects.all()
+    serializer_class = CharacterSerializer
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib import admin
-from .models import Game, Note, Diary, DiaryEntry
+from .models import Character, Game, Note, Diary, DiaryEntry
 
 #---------------------GAME ADMIN---------------------
 class GameAdmin(admin.ModelAdmin):
@@ -23,8 +23,14 @@ class DiaryEntryAdmin(admin.ModelAdmin):
     list_display = ('name', 'diary', 'description')
     search_fields = ('name', 'diary__name')
 
+#---------------------DIARY ENTRY ADMIN---------------------
+class CharacterAdmin(admin.ModelAdmin):
+    list_display = ('name','game','image','excel_file')
+    search_fields = ('name','game')
+
 # Register models in admin
 admin.site.register(Game, GameAdmin)
 admin.site.register(Note, NoteAdmin)
 admin.site.register(Diary, DiaryAdmin)
 admin.site.register(DiaryEntry, DiaryEntryAdmin)
+admin.site.register(Character, CharacterAdmin)

@@ -32,8 +32,25 @@ DEFAULT_DIARY_IMAGES = [
     'images/rolplay/games_app/diary/default/diary-wallpaper-default-09.jpg',
 ]
 
+DEFAULT_CHARACTER_IMAGES=[
+    'images/rolplay/games_app/character/default/character-default-00.jpg',
+    'images/rolplay/games_app/character/default/character-default-01.jpg',
+    'images/rolplay/games_app/character/default/character-default-02.jpg',
+    'images/rolplay/games_app/character/default/character-default-03.jpg',
+    'images/rolplay/games_app/character/default/character-default-04.jpg',
+    'images/rolplay/games_app/character/default/character-default-05.jpg',
+    'images/rolplay/games_app/character/default/character-default-06.jpg',
+    'images/rolplay/games_app/character/default/character-default-07.jpg',
+    'images/rolplay/games_app/character/default/character-default-08.jpg',
+    'images/rolplay/games_app/character/default/character-default-09.jpg',
+    'images/rolplay/games_app/character/default/character-default-10.jpg',
+]
+
 def get_random_default_game_image():
     return random.choice(DEFAULT_GAME_IMAGES)
+
+def get_random_default_character_image():
+    return random.choice(DEFAULT_CHARACTER_IMAGES)
 
 def get_random_default_diary_image():
     return random.choice(DEFAULT_DIARY_IMAGES)
@@ -163,4 +180,36 @@ class DiaryEntry(models.Model):
                 if old_image and old_image != new_image:
                     delete_image(old_image)
 
+        super().save(*args, **kwargs)
+
+class Character(models.Model):
+    name = models.CharField(max_length=100, blank=True, null=True)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='character')  
+    image = models.ImageField(upload_to='images/rolplay/games_app/character/images', blank=True, null=True, default=get_random_default_character_image)
+    excel_file = models.FileField(upload_to='files/rolplay/game_app/character/', blank=True, null=True)
+    
+    def delete(self, *args, **kwargs):
+        delete_image(self.image, default_images=DEFAULT_DIARY_IMAGES)
+        
+        if self.excel_file and self.excel_file.name != self.default_excel:
+            excel_path = self.excel_file.path
+            if os.path.isfile(excel_path):
+                os.remove(excel_path)
+        
+        super().delete(*args, **kwargs)
+    
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old_instance = Character.objects.get(pk=self.pk)
+            
+            # Verificar si la imagen cambió para eliminar la anterior
+            if old_instance.image and old_instance.image != self.image:
+                delete_image(old_instance.image, default_images=DEFAULT_DIARY_IMAGES)
+            
+            # Verificar si el archivo Excel cambió para eliminar el anterior (excepto si es el default)
+            if old_instance.excel_file and old_instance.excel_file.name != self.default_excel and old_instance.excel_file != self.excel_file:
+                excel_path = old_instance.excel_file.path
+                if os.path.isfile(excel_path):
+                    os.remove(excel_path)
+        
         super().save(*args, **kwargs)
