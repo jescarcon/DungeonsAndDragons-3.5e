@@ -32,7 +32,7 @@ DEFAULT_DIARY_IMAGES = [
     'images/rolplay/games_app/diary/default/diary-wallpaper-default-09.jpg',
 ]
 
-DEFAULT_CHARACTER_IMAGES=[
+DEFAULT_CHARACTER_IMAGES=[ 
     'images/rolplay/games_app/character/default/character-default-00.jpg',
     'images/rolplay/games_app/character/default/character-default-01.jpg',
     'images/rolplay/games_app/character/default/character-default-02.jpg',
@@ -68,7 +68,42 @@ def delete_image(*image_fields, default_images=None):
             if os.path.isfile(image_path):
                 os.remove(image_path)
 
-# --------------------- MODELOS ---------------------
+def delete_related_files(instance):
+    """
+    Elimina todos los archivos relacionados con el objeto.
+    """
+    if isinstance(instance, User):
+        # Eliminar todos los objetos relacionados con el usuario
+        for game in instance.game_set.all():
+            game.delete()
+
+    elif isinstance(instance, Game):
+        # Eliminar todos los objetos relacionados con el juego
+        for diary in instance.diaries.all():
+            diary.delete()
+        
+        for note in instance.notes.all():
+            note.delete()
+        
+        for character in instance.character.all():
+            character.delete()
+
+    elif isinstance(instance, Diary):
+        # Eliminar todos los objetos relacionados con el diario
+        for entry in instance.entries.all():
+            entry.delete()
+
+    elif isinstance(instance, Character):
+        # Eliminar la imagen y el archivo excel asociados
+        delete_image(instance.image, instance.excel_file, default_images=DEFAULT_CHARACTER_IMAGES)
+
+    elif isinstance(instance, Note):
+        # Eliminar las imágenes asociadas a la nota
+        delete_image(instance.image1, instance.image2, instance.image3)
+
+    elif isinstance(instance, DiaryEntry):
+        # Eliminar las imágenes asociadas a la entrada del diario
+        delete_image(instance.image1, instance.image2, instance.image3)
 
 class Game(models.Model):
     name = models.CharField(max_length=30, blank=True, null=True)
@@ -77,17 +112,9 @@ class Game(models.Model):
     image = models.ImageField(upload_to='images/rolplay/games_app/games/', blank=True, null=True, default=get_random_default_game_image)
 
     def delete(self, *args, **kwargs):
-        # Eliminar imágenes de los diarios y notas asociadas
-        for diary in self.diaries.all():
-            diary.delete()
-
-        for note in self.notes.all():
-            note.delete()
-
+        delete_related_files(self)
         # Eliminar la imagen del propio juego
         delete_image(self.image, default_images=DEFAULT_GAME_IMAGES)
-
-        # Finalmente, eliminar el objeto
         super().delete(*args, **kwargs)
     
     def save(self, *args, **kwargs):
@@ -108,13 +135,13 @@ class Note(models.Model):
     ]
 
     name = models.CharField(max_length=100, blank=True, null=True)
-    description = models.TextField( blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     image1 = models.ImageField(upload_to='images/rolplay/games_app/notes/', blank=True, null=True)
     image2 = models.ImageField(upload_to='images/rolplay/games_app/notes/', blank=True, null=True)
     image3 = models.ImageField(upload_to='images/rolplay/games_app/notes/', blank=True, null=True)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='Nota')
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='notes')  # Game Relation
-    completed=models.BooleanField(default=False)
+    completed = models.BooleanField(default=False)
 
     def delete(self, *args, **kwargs):
         delete_image(self.image1, self.image2, self.image3)
@@ -140,13 +167,8 @@ class Diary(models.Model):
     image = models.ImageField(upload_to='images/rolplay/games_app/diary/', blank=True, null=True, default=get_random_default_diary_image)
 
     def delete(self, *args, **kwargs):
-        # Eliminar imágenes de las entradas del diario
-        for entry in self.entries.all():
-            entry.delete()
-
-        # Eliminar la imagen del diario
+        delete_related_files(self)
         delete_image(self.image, default_images=DEFAULT_DIARY_IMAGES)
-
         super().delete(*args, **kwargs)
 
     def save(self, *args, **kwargs):
@@ -183,33 +205,28 @@ class DiaryEntry(models.Model):
         super().save(*args, **kwargs)
 
 class Character(models.Model):
-    name = models.CharField(max_length=100, blank=True, null=True)
+    name = models.CharField(max_length=50, blank=True, null=True)
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='character')  
+    description = models.TextField(max_length=300, blank=True, null=True)
     image = models.ImageField(upload_to='images/rolplay/games_app/character/images', blank=True, null=True, default=get_random_default_character_image)
     excel_file = models.FileField(upload_to='files/rolplay/game_app/character/', blank=True, null=True)
-    
+
     def delete(self, *args, **kwargs):
-        delete_image(self.image, default_images=DEFAULT_DIARY_IMAGES)
-        
-        if self.excel_file and self.excel_file.name != self.default_excel:
-            excel_path = self.excel_file.path
-            if os.path.isfile(excel_path):
-                os.remove(excel_path)
-        
+        delete_image(self.image, self.excel_file, default_images=DEFAULT_CHARACTER_IMAGES)
         super().delete(*args, **kwargs)
-    
+
     def save(self, *args, **kwargs):
         if self.pk:
             old_instance = Character.objects.get(pk=self.pk)
-            
-            # Verificar si la imagen cambió para eliminar la anterior
-            if old_instance.image and old_instance.image != self.image:
-                delete_image(old_instance.image, default_images=DEFAULT_DIARY_IMAGES)
-            
-            # Verificar si el archivo Excel cambió para eliminar el anterior (excepto si es el default)
-            if old_instance.excel_file and old_instance.excel_file.name != self.default_excel and old_instance.excel_file != self.excel_file:
-                excel_path = old_instance.excel_file.path
-                if os.path.isfile(excel_path):
-                    os.remove(excel_path)
-        
+
+            for field in ['image', 'excel_file']:
+                old_file = getattr(old_instance, field)
+                new_file = getattr(self, field)
+
+                if old_file and old_file != new_file:
+                    delete_image(old_file)
+
         super().save(*args, **kwargs)
+
+
+    

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom'; 
+import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { BASE_API_URL } from '../../../constants';
 import Añadir from '/Common/añadir_blanco.png';
 import './Tavern.css';
+
 
 export default function Tavern() {
   //#region States
@@ -13,15 +14,19 @@ export default function Tavern() {
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [contextMenu, setContextMenu] = useState(null); 
+  const [contextMenu, setContextMenu] = useState(null);
   const [newCharacter, setNewCharacter] = useState({
     name: '',
-    description:'',
+    description: '',
     game: '',
     image: '',
-    excel_file: ''
+    excel_file: null,
   });
   const [editingCharacter, setEditingCharacter] = useState(null); // Partida que está siendo editada
+  const BASE_MEDIA_URL = "http://localhost:8000/media/files/rolplay/game_app/character/default";
+  const [showCharacterModal, setShowCharacterModal] = useState(false);
+  const [selectedCharacter, setSelectedCharacter] = useState(null);
+
   //#endregion
 
   //#region Character List
@@ -29,7 +34,7 @@ export default function Tavern() {
   useEffect(() => {
     const fetchCharacters = async () => {
       const token = localStorage.getItem('access');
-  
+
       try {
         const response = await fetch(`${BASE_API_URL}/api/gameApp/character/`, {
           method: 'GET',
@@ -38,15 +43,15 @@ export default function Tavern() {
             'Authorization': `Bearer ${token}`
           }
         });
-  
+
         if (!response.ok) {
           const errorData = await response.json();
           console.error("Error al obtener personajes:", errorData);
         }
-  
+
         const data = await response.json();
         const gameCharacters = data.filter(character => character.game === parseInt(pk));
-        
+
         setCharacterList(gameCharacters);
       } catch (error) {
         console.error('Error al obtener listas de personajes:', error);
@@ -55,12 +60,12 @@ export default function Tavern() {
         setLoading(false);
       }
     };
-  
-    if (pk) { 
+
+    if (pk) {
       fetchCharacters();
     }
   }, [pk]);
-  
+
   //#endregion 
 
   //#region Modal Logic
@@ -121,7 +126,7 @@ export default function Tavern() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setNewCharacter({ name: '',description:'', game: '', image: '', excel_file: ''}); // Limpiar los campos del formulario
+    setNewCharacter({ name: '', description: '', game: '', image: '', excel_file: '' }); // Limpiar los campos del formulario
   };
 
   const handleCloseEditModal = () => {
@@ -147,6 +152,25 @@ export default function Tavern() {
     }
   };
 
+  const handleExcelChange = (e, isEdit = false) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (isEdit) {
+        setEditingCharacter(prevState => ({
+          ...prevState,
+          excel_file: file,
+          excelFileName: file.name
+        }));
+      } else {
+        setNewCharacter(prevState => ({
+          ...prevState,
+          excel_file: file,
+          excelFileName: file.name
+        }));
+      }
+    }
+  };
+
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditingCharacter(prevState => ({ ...prevState, [name]: value }));
@@ -164,6 +188,16 @@ export default function Tavern() {
   };
 
 
+  const handleDownload = (fileName) => {
+    const fileUrl = `${BASE_MEDIA_URL}/${fileName}`;
+    const link = document.createElement("a");
+    link.href = fileUrl;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('access');
@@ -172,12 +206,14 @@ export default function Tavern() {
       const formData = new FormData();
       formData.append('name', newCharacter.name);
       formData.append('description', newCharacter.description);
-      formData.append('game', newCharacter.game);
-      formData.append('image', newCharacter.image);
-      formData.append('excel_file', newCharacter.excel_file);
+      formData.append('game', pk);
 
       if (newCharacter.image) {
         formData.append('image', newCharacter.image, newCharacter.image.name);
+      }
+
+      if (newCharacter.excel_file) {
+        formData.append('excel_file', newCharacter.excel_file, newCharacter.excel_file.name);
       }
 
       const response = await fetch(`${BASE_API_URL}/api/gameApp/character/`, {
@@ -201,6 +237,7 @@ export default function Tavern() {
     }
   };
 
+
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('access');
@@ -209,16 +246,15 @@ export default function Tavern() {
       const formData = new FormData();
       formData.append('name', editingCharacter.name);
       formData.append('description', editingCharacter.description);
-      formData.append('game', editingCharacter.game);
-      formData.append('image', editingCharacter.image);
-      formData.append('excel_file', editingCharacter.excel_file);
+      formData.append('game', pk);
 
-      // Si la image es null, significa que el usuario ha decidido eliminarla
-      if (editingCharacter.image === null) {
-        formData.append('image', '');
-      } else if (editingCharacter.image instanceof File) {
-        // Si hay una nueva image seleccionada, agregarla
+      if (editingCharacter.image instanceof File) {
         formData.append('image', editingCharacter.image, editingCharacter.image.name);
+      }
+
+      // Manejo del archivo Excel
+      if (editingCharacter.excel_file instanceof File) {
+        formData.append('excel_file', editingCharacter.excel_file, editingCharacter.excel_file.name);
       }
 
       const response = await fetch(`${BASE_API_URL}/api/gameApp/character/${editingCharacter.id}/`, {
@@ -235,13 +271,18 @@ export default function Tavern() {
 
       const data = await response.json();
 
-      // Actualiza la lista de partidas con los datos actualizados
+      // Actualiza la lista de personajes
       setCharacterList(prevState => prevState.map(character => character.id === data.id ? data : character));
       handleCloseEditModal();
     } catch (error) {
       console.error('Error al actualizar el personaje:', error);
       setError('Fallo al actualizar el personaje');
     }
+  };
+
+  const handleCloseShowModal = () => {
+    setShowCharacterModal(false);
+    setSelectedCharacter(null);
   };
 
   if (loading) {
@@ -267,24 +308,22 @@ export default function Tavern() {
           <img src={Añadir} alt="Añadir" className="add-icon" />
         </button>
       </div>
-      
+
       <div className="character-list-options">
         {characterList.length > 0 ? (
           characterList.map(character => (
-            <div key={character.id} className="character-link" onContextMenu={(e) => handleContextMenu(e, character)}>
-              <Link to={`/character/${character.id}`} className="character-card">
-                <div className="character-card-image">
-                  {character.image ? (
-                    <img src={constructImageUrl(character.image)} alt="Fallo al cargar la imagen" />
-                  ) : (
-                    <div className="character-card-placeholder"></div>
-                  )}
-                  <div className="character-card-tooltip">
-                    <div className="character-card-tooltip-text">{character.description}</div>
-                  </div>
-                  <div className="character-card-title">{character.name}</div>
+            <div key={character.id} className="character-link" onContextMenu={(e) => handleContextMenu(e, character)} onClick={() => { setSelectedCharacter(character); setShowCharacterModal(true); }}>
+              <div className="character-card-image">
+                {character.image ? (
+                  <img src={constructImageUrl(character.image)} alt="Fallo al cargar la imagen" />
+                ) : (
+                  <div className="character-card-placeholder"></div>
+                )}
+                <div className="character-card-tooltip">
+                  <div className="character-card-tooltip-text">{character.description}</div>
                 </div>
-              </Link>
+                <div className="character-card-title">{character.name}</div>
+              </div>
             </div>
           ))
         ) : (
@@ -306,7 +345,7 @@ export default function Tavern() {
                   value={newCharacter.name}
                   onChange={handleInputChange}
                   required
-                  maxLength="30"
+                  maxLength="50"
                   placeholder='Nathaniel'
                 />
               </label>
@@ -316,7 +355,7 @@ export default function Tavern() {
                   name="description"
                   value={newCharacter.description}
                   onChange={handleInputChange}
-                  maxLength="60"
+                  maxLength="300"
                   placeholder='Paladín caído y algo engreído, inicia su venganza junto a un extraño grupo de héroes.'
                 />
               </label>
@@ -335,6 +374,24 @@ export default function Tavern() {
                   </div>
                 )}
               </label>
+              <label>
+                Ficha (Excel):
+                <input
+                  type="file"
+                  accept=".xls,.xlsx"
+                  title=""
+                  onChange={(e) => handleExcelChange(e, false)} // false = modo creación
+                />
+                {newCharacter.excelFileName && (
+                  <div>
+                    <span>{newCharacter.excelFileName}</span>
+                  </div>
+                )}
+              </label>
+              <div className="modal-buttons">
+                <button onClick={() => handleDownload("Ficha_Rol-Plana.xlsx")}>Descargar Ficha Vacía</button>
+                <button onClick={() => handleDownload("Ficha_Rol.xlsx")}>Descargar Ficha Con Fórmulas</button>
+              </div>
               <div className="modal-buttons">
                 <button type="submit">Crear</button>
                 <button type="button" onClick={handleCloseModal}>Cancelar</button>
@@ -358,8 +415,8 @@ export default function Tavern() {
                   value={editingCharacter.name}
                   onChange={handleEditChange}
                   required
-                  maxLength="30"
-                  placeholder='Nathaniel'                
+                  maxLength="50"
+                  placeholder='Nathaniel'
                 />
               </label>
               <label>
@@ -368,9 +425,9 @@ export default function Tavern() {
                   name="description"
                   value={editingCharacter.description}
                   onChange={handleEditChange}
-                  maxLength="60"
+                  maxLength="300"
                   placeholder='Paladín caído y algo engreído, inicia su venganza junto a un extraño grupo de héroes.'
-                
+
                 />
               </label>
               <label>
@@ -387,6 +444,29 @@ export default function Tavern() {
                   </div>
                 )}
               </label>
+
+              <label>
+                Ficha (Excel):
+                <input
+                  type="file"
+                  accept=".xls,.xlsx"
+                  title=""
+                  onChange={(e) => handleExcelChange(e, true)} // true = modo edición
+                />
+                {(editingCharacter.excelFileName || editingCharacter.excel_file) && (
+                  <div>
+                    <span>
+                      {editingCharacter.excelFileName
+                        ? editingCharacter.excelFileName
+                        : editingCharacter.excel_file.replace(`${BASE_API_URL}/media/files/rolplay/game_app/character/`, "")}
+                    </span>
+                  </div>
+                )}
+              </label>
+              <div className="modal-buttons">
+                <button onClick={() => handleDownload("Ficha_Rol-Plana.xlsx")}>Descargar Ficha Vacía</button>
+                <button onClick={() => handleDownload("Ficha_Rol.xlsx")}>Descargar Ficha Con Fórmulas</button>
+              </div>
               <div className="modal-buttons">
                 <button type="submit">Actualizar</button>
                 <button type="button" onClick={handleCloseEditModal}>Cancelar</button>
@@ -395,7 +475,6 @@ export default function Tavern() {
           </div>
         </div>
       )}
-
 
       {contextMenu && (
         <div
@@ -406,6 +485,31 @@ export default function Tavern() {
           <button onClick={() => handleDelete(contextMenu.character.id)}>Eliminar</button>
         </div>
       )}
+
+      {showCharacterModal && selectedCharacter && (
+        <div className="modal-overlay" onClick={handleCloseShowModal}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={handleCloseShowModal}>×</button>
+            <h2 className="character-detail-name">{selectedCharacter.name}</h2>
+            <div className="character-detail-description">
+              <p>{selectedCharacter.description}</p>
+            </div>
+            <hr className='separador'></hr>
+            {selectedCharacter.excel_file ? (
+              <div className="download-button">
+                <a href={selectedCharacter.excel_file} download >
+                  Descargar ficha
+                </a>
+              </div>
+            ) : (
+              <p>El personaje no tiene ficha disponible.</p>
+            )}
+
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 }

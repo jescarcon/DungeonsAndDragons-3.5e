@@ -47,13 +47,13 @@ class GameSerializer(serializers.ModelSerializer):
         model = Game
         fields = ['id', 'name', 'description', 'image', 'notes', 'diaries','user']
 
-#---------------------GAME SERIALIZER---------------------
+#---------------------CHARACTER SERIALIZER---------------------
 class CharacterSerializer(serializers.ModelSerializer):
     game = serializers.PrimaryKeyRelatedField(queryset=Game.objects.all())
 
     class Meta:
         model = Character
-        fields = ['id', 'name', 'game', 'image', 'excel_file']
+        fields = ['id', 'name', 'description','game', 'image', 'excel_file']
 
     def update(self, instance, validated_data):
         # Si la imagen o el archivo Excel NO se envían en la petición, mantener los anteriores.
