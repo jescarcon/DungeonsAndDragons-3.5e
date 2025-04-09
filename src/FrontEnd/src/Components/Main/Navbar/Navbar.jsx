@@ -22,7 +22,7 @@ const Navbar = () => {
         <a href="/games" className="navbar-item">Mis Partidas</a>
         <a href="/combat" className="navbar-item">Combate</a>
         <a href="#" className="navbar-item">Libreria</a>
-        <a href="#" className="navbar-item">Perfil</a>
+        <a href="/profile" className="navbar-item">Perfil</a>
         <a href="/logout" className="navbar-item">Cerrar Sesión</a>
       </div>
       <div className="navbar-toggle" onClick={toggleMenu}>

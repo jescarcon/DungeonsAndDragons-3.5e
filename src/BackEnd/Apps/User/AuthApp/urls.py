@@ -14,6 +14,8 @@ urlpatterns = [
     path("users/", ListUserView.as_view(), name="user-list"), #GET Users
     path('users/id/<int:pk>/', UserByIDDetailView.as_view(), name='user-detail-by-id'), #GET User by Id
     path('users/<str:username>/', UserByUsernameDetailView.as_view(), name='user-detail-by-username'), #GET User by name
+    path('me/update/', UpdateOwnProfileView.as_view(), name='update-profile'),
+
     #Auth
 
 ]
