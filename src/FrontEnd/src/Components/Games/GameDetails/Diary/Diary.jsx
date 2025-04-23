@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { BASE_API_URL } from '../../../constants';
 import Añadir from '/Common/añadir_blanco.png';
 import './Diary.css';
+import Modal from '../../../Modal/Modal';
 
 export default function Diary() {
   //#region States
@@ -17,6 +18,8 @@ export default function Diary() {
   const [editingDiary, setEditingDiary] = useState(null); // Diario que está siendo editado
   const { pk } = useParams();
   const fileInputRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
   //#endregion
 
   //#region Logic
@@ -222,34 +225,44 @@ export default function Diary() {
 
   return (
     <div className='diary-container'>
-      <div className="diary-header">
-        <h1>Diarios de {gameName}</h1>
-        <button className='diary-add-button' onClick={() => setShowModal(true)} title="Añadir un diario">
-          <img src={Añadir} alt="Añadir" className="add-icon" />
-        </button>
+      <div className="game-header">
+        <div className='game-header-title'><h1>Diarios de la partida: {gameName}</h1></div>
+        <div className="game-header-searcher">
+          <input
+            type="text"
+            placeholder="Buscar partidas..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="game-search-input"
+          />
+          <button className="" onClick={() => setShowModal(true)} title="Añadir una partida">
+            + Añadir
+          </button>
+        </div>
       </div>
-
       <div className='diary-list'>
         {diaries.length > 0 ? (
-          diaries.map((diary) => (
-            <div
-              key={diary.id}
-              className='diary-item'
-              onContextMenu={(e) => handleContextMenu(e, diary)} // Add context menu handler here
-            >
-              <Link to={`/games/${pk}/diaries/${diary.id}/entries`}>
-                <img src={diary.image} alt="Diario" className='diary-image' />
-                <div className='diary-name'>{diary.name}</div>
-                <div className='diary-overlay'>
-                  <div className='diary-description'>
-                    <div className='diary-description-text'>
-                      {diary.description}
+          diaries
+            .filter(diary => diary.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            .map((diary) => (
+              <div
+                key={diary.id}
+                className='diary-item'
+                onContextMenu={(e) => handleContextMenu(e, diary)} // Add context menu handler here
+              >
+                <Link to={`/games/${pk}/diaries/${diary.id}/entries`}>
+                  <img src={diary.image} alt="Diario" className='diary-image' />
+                  <div className='diary-name'>{diary.name}</div>
+                  <div className='diary-overlay'>
+                    <div className='diary-description'>
+                      <div className='diary-description-text'>
+                        {diary.description}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            </div>
-          ))
+                </Link>
+              </div>
+            ))
         ) : (
           <p className='noGameList'>Aún no tienes ningún diario. ¡Empieza creando uno!</p>
         )}
@@ -267,104 +280,104 @@ export default function Diary() {
         </div>
       )}
 
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
-            <h2>Crear nuevo diario para {gameName}</h2>
-            <form onSubmit={(e) => { e.preventDefault(); handleCreateDiary(); }} className="modal-form">
-              <label>
-                Nombre:
-                <input
-                  type="text"
-                  value={newDiary.name}
-                  onChange={(e) => setNewDiary({ ...newDiary, name: e.target.value })}
-                  required
-                  placeholder='Diario de Nathaniel'
-                  maxLength="30"
-                />
-              </label>
-              <label>
-                Descripción:
-                <textarea
-                  maxLength="60"
-                  value={newDiary.description}
-                  placeholder='Viejo cuaderno de cuero algo raído, contiene dibujos y anotaciones...'
-                  onChange={(e) => setNewDiary({ ...newDiary, description: e.target.value })}
-                />
-              </label>
-              <label>
-                Imagen:
-                <input
-                  type="file"
-                  accept="image/*"
-                  title=""
-                  onChange={handleImageChange}
-                />
-                {newDiary.imagePreview && (
-                  <div>
-                    <img src={newDiary.imagePreview} alt="Vista previa" className="image-preview" />
-                  </div>
-                )}
-              </label>
-              <div className="modal-buttons">
-                <button type="submit">Guardar</button>
-                <button type="button" onClick={handleCancel}>Cancelar</button>
+
+
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+
+        <h2>Crear nuevo diario para {gameName}</h2>
+        <form onSubmit={(e) => { e.preventDefault(); handleCreateDiary(); }} className="modal-form">
+          <label>
+            Nombre:
+            <input
+              type="text"
+              value={newDiary.name}
+              onChange={(e) => setNewDiary({ ...newDiary, name: e.target.value })}
+              required
+              placeholder='Diario de Nathaniel'
+              maxLength="30"
+            />
+          </label>
+          <label>
+            Descripción:
+            <textarea
+              maxLength="60"
+              value={newDiary.description}
+              placeholder='Viejo cuaderno de cuero algo raído, contiene dibujos y anotaciones...'
+              onChange={(e) => setNewDiary({ ...newDiary, description: e.target.value })}
+            />
+          </label>
+          <label>
+            Imagen:
+            <input
+              type="file"
+              accept="image/*"
+              title=""
+              onChange={handleImageChange}
+            />
+            {newDiary.imagePreview && (
+              <div>
+                <img src={newDiary.imagePreview} alt="Vista previa" className="image-preview" />
               </div>
-            </form>
+            )}
+          </label>
+          <div className="modal-buttons">
+            <button type="submit">Guardar</button>
+            <button type="button" onClick={handleCancel}>Cancelar</button>
           </div>
-        </div>
+        </form>
+
+      </Modal>
+
+
+
+      {editDiary && (
+        <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)}>
+          <h2>Editar Diario</h2>
+          <form onSubmit={(e) => { e.preventDefault(); handleEditDiary(); }} className="modal-form">
+            <label>
+              Nombre:
+              <input
+                type="text"
+                value={editDiary.name}
+                onChange={(e) => setEditDiary({ ...editDiary, name: e.target.value })}
+                required
+                placeholder='Diario de Nathaniel'
+                maxLength="30"
+              />
+            </label>
+            <label>
+              Descripción:
+              <textarea
+                value={editDiary.description}
+                placeholder='Viejo cuaderno de cuero algo raído, contiene dibujos y anotaciones...'
+                onChange={(e) => setEditDiary({ ...editDiary, description: e.target.value })}
+                maxLength="60"
+
+              />
+            </label>
+            <label>
+              Imagen:
+              <input
+                title=""
+                type="file"
+                accept="image/*"
+                onChange={handleEditImageChange}
+              />
+              {editDiary.imagePreview && (
+                <div>
+                  <img src={editDiary.imagePreview} alt="Vista previa" className="image-preview" />
+                </div>
+              )}
+            </label>
+            <div className="modal-buttons">
+              <button type="submit">Actualizar</button>
+              <button type="button" onClick={() => setShowEditModal(false)}>Cancelar</button>
+            </div>
+          </form>
+        </Modal>
+
       )}
 
-      {showEditModal && editDiary && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <button className="modal-close" onClick={() => setShowEditModal(false)}>×</button>
-            <h2>Editar Diario</h2>
-            <form onSubmit={(e) => { e.preventDefault(); handleEditDiary(); }} className="modal-form">
-              <label>
-                Nombre:
-                <input
-                  type="text"
-                  value={editDiary.name}
-                  onChange={(e) => setEditDiary({ ...editDiary, name: e.target.value })}
-                  required
-                  placeholder='Diario de Nathaniel'
-                  maxLength="30"
-                />
-              </label>
-              <label>
-                Descripción:
-                <textarea
-                  value={editDiary.description}
-                  placeholder='Viejo cuaderno de cuero algo raído, contiene dibujos y anotaciones...'
-                  onChange={(e) => setEditDiary({ ...editDiary, description: e.target.value })}
-                  maxLength="60"
-
-                />
-              </label>
-              <label>
-                Imagen:
-                <input
-                  title=""
-                  type="file"
-                  accept="image/*"
-                  onChange={handleEditImageChange}
-                />
-                {editDiary.imagePreview && (
-                  <div>
-                    <img src={editDiary.imagePreview} alt="Vista previa" className="image-preview" />
-                  </div>
-                )}
-              </label>
-              <div className="modal-buttons">
-                <button type="submit">Actualizar</button>
-                <button type="button" onClick={() => setShowEditModal(false)}>Cancelar</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

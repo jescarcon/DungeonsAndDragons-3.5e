@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { BASE_API_URL } from '../../../constants';
+import Modal from '../../../Modal/Modal';
 import Añadir from '/Common/añadir_negro.png';
 import Pin from '/Character/Note/pin.png';
 import './Notes.css';
@@ -63,9 +64,16 @@ export default function Notes() {
   const [selectedNote, setSelectedNote] = useState(null);
   const [zoomedImage, setZoomedImage] = useState(null);
 
+  const [searchTerm, setSearchTerm] = useState('');
+
   //#endregion 
 
   //#region Logica
+
+  // Limpiar la búsqueda cuando se cambie de tab
+  useEffect(() => {
+    setSearchTerm('');  // Limpiar el término de búsqueda al cambiar de tab
+  }, [activeTab]);
 
   useEffect(() => {
     const fetchNotes = async () => {
@@ -125,8 +133,13 @@ export default function Notes() {
     const currentPage = page[activeTab];
     const filteredNotes = notes.filter((note) => note.type === type);
 
+    // Filtra las notas por el término de búsqueda
+    const searchedNotes = filteredNotes.filter((note) =>
+      note.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     // Invertir el orden de las notas para mostrar las más recientes primero
-    const sortedNotes = filteredNotes.reverse();
+    const sortedNotes = searchedNotes.reverse();
 
     const totalPages = Math.ceil(sortedNotes.length / itemsPerPage);
 
@@ -142,16 +155,20 @@ export default function Notes() {
         ) : (<>
           <div>
             {/* Botón para añadir una nota */}
-            <div className="entries-header">
-              <button
-                className="entries-add-button"
-                onClick={() => setShowModal(true)}
-                title="Añadir una nota"
-              >
-                <div className="Notes-add-button">
-                  <img src={Añadir} alt="Añadir" className="Notes-add-icon" />
-                </div>
-              </button>
+
+            <div className="game-header">
+              <div className="game-header-searcher">
+                <input
+                  type="text"
+                  placeholder="Buscar notas..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="game-search-input"
+                />
+                <button className="" onClick={setShowModal} title="Añadir una partida">
+                  + Añadir
+                </button>
+              </div>
             </div>
 
             {/* Contenedor para las notas */}
@@ -370,6 +387,7 @@ export default function Notes() {
     formData.append('description', editNotes.description);
     formData.append('game', pk);
     formData.append('completed', editNotes.completed);
+    formData.append('type', editNotes.type);
 
     // Si la imagen es un archivo, la enviamos. Si no, no la agregamos a FormData.
     if (editNotes.image1 instanceof File) formData.append('image1', editNotes.image1);
@@ -413,7 +431,7 @@ export default function Notes() {
       imagePreview1: note.image1 ? `${BASE_API_URL}${note.image1}` : null,
       imagePreview2: note.image2 ? `${BASE_API_URL}${note.image2}` : null,
       imagePreview3: note.image3 ? `${BASE_API_URL}${note.image3}` : null,
-      completed:note.completed,
+      completed: note.completed,
     });
     setShowEditModal(true);
   };
@@ -422,10 +440,7 @@ export default function Notes() {
 
 
   return (
-    <div
-      className="notes-container"
-      onClick={handleCloseContextMenu} // Cierra el menú contextual al hacer clic fuera
-    >
+    <div className="notes-container" onClick={handleCloseContextMenu}>
       <div className="tab-container">
         <div
           className={`tab ${activeTab === 'Principal' ? 'active' : ''}`}
@@ -492,90 +507,87 @@ export default function Notes() {
         </div>
       )}
 
-      {showModal && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={closeModal}>×</button>
-            <h2>Crear entrada para la categoría {activeTab}</h2>
-            <form className="modal-form">
-              <label>
-                Nombre:
-                <input
-                  type="text"
-                  name="name"
-                  value={newNote.name}
-                  onChange={handleInputChange}
-                  required
-                  placeholder='Rescatar a los civiles del incendio.'
-                  maxLength={100}
-                />
-              </label>
+      <Modal isOpen={showModal} onClose={closeModal}>
 
-              <label>
-                Descripción:
-                <textarea
-                  className='note-description'
-                  name="description"
-                  value={newNote.description}
-                  onChange={handleInputChange}
-                  placeholder='Debemos ir a comprobar que todos estan a salvo.'
 
-                />
-              </label>
-              <label>
-                Imagen 1:
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImageChange(e, 'image1', 'imagePreview1')}
-                />
-                {newNote.imagePreview1 && (
-                  <div>
-                    <img src={newNote.imagePreview1} alt="Vista previa 1" className="image-preview" />
-                  </div>
-                )}
-              </label>
+        <h2>Crear entrada para la categoría {activeTab}</h2>
+        <form className="modal-form">
+          <label>
+            Nombre:
+            <input
+              type="text"
+              name="name"
+              value={newNote.name}
+              onChange={handleInputChange}
+              required
+              placeholder='Rescatar a los civiles del incendio.'
+              maxLength={100}
+            />
+          </label>
 
-              <label>
-                Imagen 2:
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImageChange(e, 'image2', 'imagePreview2')}
-                />
-                {newNote.imagePreview2 && (
-                  <div>
-                    <img src={newNote.imagePreview2} alt="Vista previa 2" className="image-preview" />
-                  </div>
-                )}
-              </label>
+          <label>
+            Descripción:
+            <textarea
+              className='note-description'
+              name="description"
+              value={newNote.description}
+              onChange={handleInputChange}
+              placeholder='Debemos ir a comprobar que todos estan a salvo.'
 
-              <label>
-                Imagen 3:
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImageChange(e, 'image3', 'imagePreview3')}
-                />
-                {newNote.imagePreview3 && (
-                  <div>
-                    <img src={newNote.imagePreview3} alt="Vista previa 3" className="image-preview" />
-                  </div>
-                )}
-              </label>
-            </form>
-            <div className="modal-buttons">
-              <button type="submit" onClick={handleCreateNote}>Guardar</button>
-              <button type="button" onClick={closeModal}>Cancelar</button>
-            </div>
-          </div>
+            />
+          </label>
+          <label>
+            Imagen 1:
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageChange(e, 'image1', 'imagePreview1')}
+            />
+            {newNote.imagePreview1 && (
+              <div>
+                <img src={newNote.imagePreview1} alt="Vista previa 1" className="image-preview" />
+              </div>
+            )}
+          </label>
+
+          <label>
+            Imagen 2:
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageChange(e, 'image2', 'imagePreview2')}
+            />
+            {newNote.imagePreview2 && (
+              <div>
+                <img src={newNote.imagePreview2} alt="Vista previa 2" className="image-preview" />
+              </div>
+            )}
+          </label>
+
+          <label>
+            Imagen 3:
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageChange(e, 'image3', 'imagePreview3')}
+            />
+            {newNote.imagePreview3 && (
+              <div>
+                <img src={newNote.imagePreview3} alt="Vista previa 3" className="image-preview" />
+              </div>
+            )}
+          </label>
+        </form>
+        <div className="modal-buttons">
+          <button type="submit" onClick={handleCreateNote}>Guardar</button>
+          <button type="button" onClick={closeModal}>Cancelar</button>
         </div>
-      )}
 
-      {showEditModal && editNotes && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <button className="modal-close" onClick={() => setShowEditModal(false)}>×</button>
+      </Modal>
+
+      <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)}>
+        {editNotes && (
+          <>
             <h2>Editar Diario</h2>
             <form onSubmit={(e) => { e.preventDefault(); handleEditNote(); }} className="modal-form">
               <label>
@@ -628,14 +640,13 @@ export default function Notes() {
                 <button type="button" onClick={() => setShowEditModal(false)}>Cancelar</button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </Modal>
 
-      {showNoteModal && selectedNote && (
-        <div className="modal-overlay" onClick={handleCloseNoteModal}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={handleCloseNoteModal}>×</button>
+      <Modal isOpen={showNoteModal} onClose={handleCloseNoteModal}>
+        {selectedNote && (
+          <>
             <h2 className='note-detail-name'>{selectedNote.name}</h2>
             <div className="note-detail-description">
               <p>{selectedNote.description}</p>
@@ -663,9 +674,11 @@ export default function Notes() {
                 />
               )}
             </div>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </Modal>
+
+
 
       {zoomedImage && (
         <div className="zoomed-image-overlay" onClick={() => setZoomedImage(null)}>

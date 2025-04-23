@@ -26,6 +26,7 @@ export default function Tavern() {
   const BASE_MEDIA_URL = "http://localhost:8000/media/files/rolplay/game_app/character/default";
   const [showCharacterModal, setShowCharacterModal] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   //#endregion
 
@@ -302,16 +303,27 @@ export default function Tavern() {
 
   return (
     <div className="character-list-container">
-      <div className="character-header">
-        <h1>Mis Personajes</h1>
-        <button className="character-add-button" onClick={handleOpenModal} title="Añadir un personaje">
-          <img src={Añadir} alt="Añadir" className="add-icon" />
-        </button>
+      <div className="game-header">
+        <div className='game-header-title'><h1>Mis Personajes</h1></div>
+        <div className="game-header-searcher">
+          <input
+            type="text"
+            placeholder="Buscar partidas..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="game-search-input"
+          />
+          <button className="" onClick={handleOpenModal} title="Añadir una partida">
+            + Añadir
+          </button>
+        </div>
       </div>
 
       <div className="character-list-options">
         {characterList.length > 0 ? (
-          characterList.map(character => (
+          characterList
+          .filter(x => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+          .map(character => (
             <div key={character.id} className="character-link" onContextMenu={(e) => handleContextMenu(e, character)} onClick={() => { setSelectedCharacter(character); setShowCharacterModal(true); }}>
               <div className="character-card-image">
                 {character.image ? (

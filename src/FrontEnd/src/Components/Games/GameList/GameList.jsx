@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BASE_API_URL } from '../../constants';
-import Añadir from '/Common/añadir_blanco.png';
+import Modal from '../../Modal/Modal';
 import './GameList.css';
 
 export default function GameList() {
@@ -13,13 +13,15 @@ export default function GameList() {
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [contextMenu, setContextMenu] = useState(null); 
+  const [contextMenu, setContextMenu] = useState(null);
   const [newGame, setNewGame] = useState({
     name: '',
     description: '',
     image: ''
   });
   const [editingGame, setEditingGame] = useState(null); // Partida que está siendo editada
+  const [searchTerm, setSearchTerm] = useState('');
+
   //#endregion
 
   //#region GameList
@@ -280,16 +282,27 @@ export default function GameList() {
   return (
     <div className="game-list-container">
       <div className="game-header">
-        <h1>Mis Partidas</h1>
-        <button className="game-add-button" onClick={handleOpenModal} title="Añadir una partida">
-          <img src={Añadir} alt="Añadir" className="add-icon" />
-        </button>
+        <div className='game-header-title'><h1>Mis Partidas</h1></div>
+        <div className="game-header-searcher">
+          <input
+            type="text"
+            placeholder="Buscar partidas..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="game-search-input"
+          />
+          <button className="" onClick={handleOpenModal} title="Añadir una partida">
+            + Añadir
+          </button>
+        </div>
       </div>
-      
+
+
       <div className="game-list-options">
         {gameLists.length > 0 ? (
-          gameLists.map(game => (
-            <div key={game.id} className="game-link" onContextMenu={(e) => handleContextMenu(e, game)}>
+          gameLists
+            .filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            .map(game => (<div key={game.id} className="game-link" onContextMenu={(e) => handleContextMenu(e, game)}>
               <Link to={`/games/${game.id}`} className="game-card">
                 <div className="game-card-image">
                   {game.image ? (
@@ -304,116 +317,113 @@ export default function GameList() {
                 </div>
               </Link>
             </div>
-          ))
+            ))
         ) : (
           <p className='noGameList'>Aún no tienes ninguna partida. ¡Empieza creando una!</p>
         )}
       </div>
 
-      {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <button className="modal-close" onClick={handleCloseModal}>×</button>
-            <h2>Crear Nueva Partida</h2>
-            <form onSubmit={handleSubmit} className="modal-form">
-              <label>
-                Nombre:
-                <input
-                  type="text"
-                  name="name"
-                  value={newGame.name}
-                  onChange={handleInputChange}
-                  required
-                  maxLength="30"
-                  placeholder='La Sholen Yan'
-                />
-              </label>
-              <label>
-                Descripción:
-                <textarea
-                  name="description"
-                  value={newGame.description}
-                  onChange={handleInputChange}
-                  maxLength="60"
-                  placeholder='La historia de 8 bravos guerreros que salvaron el mundo.'
-                />
-              </label>
-              <label>
-                Imagen:
-                <input
-                  type="file"
-                  accept="image/*"
-                  title=""
-                  onChange={handleImageChange}
-                />
-                {newGame.imagePreview && (
-                  <div>
-                    <img src={newGame.imagePreview} alt="Vista previa" className="image-preview" />
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
 
-                  </div>
-                )}
-              </label>
-              <div className="modal-buttons">
-                <button type="submit">Crear</button>
-                <button type="button" onClick={handleCloseModal}>Cancelar</button>
+        <h2>Crear Nueva Partida</h2>
+        <form onSubmit={handleSubmit} className="modal-form">
+          <label>
+            Nombre:
+            <input
+              type="text"
+              name="name"
+              value={newGame.name}
+              onChange={handleInputChange}
+              required
+              maxLength="30"
+              placeholder='La Sholen Yan'
+            />
+          </label>
+          <label>
+            Descripción:
+            <textarea
+              name="description"
+              value={newGame.description}
+              onChange={handleInputChange}
+              maxLength="60"
+              placeholder='La historia de 8 bravos guerreros que salvaron el mundo.'
+            />
+          </label>
+          <label>
+            Imagen:
+            <input
+              type="file"
+              accept="image/*"
+              title=""
+              onChange={handleImageChange}
+            />
+            {newGame.imagePreview && (
+              <div>
+                <img src={newGame.imagePreview} alt="Vista previa" className="image-preview" />
+
               </div>
-            </form>
+            )}
+          </label>
+          <div className="modal-buttons">
+            <button type="submit">Crear</button>
+            <button type="button" onClick={handleCloseModal}>Cancelar</button>
           </div>
-        </div>
-      )}
+        </form>
 
-      {isEditModalOpen && editingGame && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <button className="modal-close" onClick={handleCloseEditModal}>×</button>
-            <h2>Editar Partida</h2>
-            <form onSubmit={handleEditSubmit} className="modal-form">
-              <label>
-                Nombre:
-                <input
-                  type="text"
-                  name="name"
-                  value={editingGame.name}
-                  onChange={handleEditChange}
-                  required
-                  maxLength="30"
-                  placeholder='La Sholen Yan'                
-                />
-              </label>
-              <label>
-                Descripción:
-                <textarea
-                  name="description"
-                  value={editingGame.description}
-                  onChange={handleEditChange}
-                  maxLength="60"
-                  placeholder='La historia de 8 bravos guerreros que salvaron el mundo.'
-                
-                />
-              </label>
-              <label>
-                Imagen:
-                <input
-                  title=""
-                  type="file"
-                  accept="image/*"
-                  onChange={handleEditImageChange}
-                />
-                {editingGame.imagePreview && (
-                  <div>
-                    <img src={editingGame.imagePreview} alt="Vista previa" className="image-preview" />
-                  </div>
-                )}
-              </label>
-              <div className="modal-buttons">
-                <button type="submit">Actualizar</button>
-                <button type="button" onClick={handleCloseEditModal}>Cancelar</button>
-              </div>
-            </form>
+      </Modal>
+
+      {editingGame && (
+        <Modal isOpen={isEditModalOpen} onClose={handleCloseEditModal}>
+          <div className="modal-overlay">
+            <div className="modal">
+              <h2>Editar Partida</h2>
+              <form onSubmit={handleEditSubmit} className="modal-form">
+                <label>
+                  Nombre:
+                  <input
+                    type="text"
+                    name="name"
+                    value={editingGame.name}
+                    onChange={handleEditChange}
+                    required
+                    maxLength="30"
+                    placeholder='La Sholen Yan'
+                  />
+                </label>
+                <label>
+                  Descripción:
+                  <textarea
+                    name="description"
+                    value={editingGame.description}
+                    onChange={handleEditChange}
+                    maxLength="60"
+                    placeholder='La historia de 8 bravos guerreros que salvaron el mundo.'
+
+                  />
+                </label>
+                <label>
+                  Imagen:
+                  <input
+                    title=""
+                    type="file"
+                    accept="image/*"
+                    onChange={handleEditImageChange}
+                  />
+                  {editingGame.imagePreview && (
+                    <div>
+                      <img src={editingGame.imagePreview} alt="Vista previa" className="image-preview" />
+                    </div>
+                  )}
+                </label>
+                <div className="modal-buttons">
+                  <button type="submit">Actualizar</button>
+                  <button type="button" onClick={handleCloseEditModal}>Cancelar</button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
+        </Modal>
       )}
-
 
       {contextMenu && (
         <div

@@ -1,0 +1,28 @@
+.modal-container {
+  position: fixed;  /* Fija el modal en la pantalla, sin importar el scroll */
+  top: 0; left: 0;  /* Lo posiciona en la esquina superior izquierda */
+  width: 100%; height: 100%;  /* Ocupa toda la pantalla */
+
+  display: flex;
+  align-items: center;  
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.5);  
+  
+}
+
+.modal-content {
+  background: white;  /* Fondo blanco para resaltar el contenido */
+  border-radius: 8px;  /* Bordes redondeados */
+  padding: 20px;  /* Espaciado interno para el contenido */
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;  
+  top: 10px; right: 10px;  /* Ubica el botón en la esquina superior derecha */
+  background: none;  /* Sin fondo para que se vea limpio */
+  border: none;  /* Sin bordes para que se vea solo el icono */
+  font-size: 18px;  /* Tamaño del icono de cierre */
+  cursor: pointer;  /* Cambia el cursor a una mano para indicar que es clickeable */
+}

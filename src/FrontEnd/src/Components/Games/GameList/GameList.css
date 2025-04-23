@@ -3,6 +3,7 @@
     padding: 20px;
     max-width: 90%;
     margin: 0 auto;
+    user-select: none;
   }
   
   /* Title styling */
@@ -20,22 +21,46 @@
     justify-content: center;
     color: white;
     user-select: none;
+    flex-direction: column;
+    margin-bottom: 2%;
+  }
+  
+  
+  .game-header-searcher {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+
 
   }
   
-  .game-add-button {
-    background-color: transparent;
+  /* Input de búsqueda */
+  .game-search-input {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background-color: #1a1a1a;
+    color: white;
+    font-size: 1rem;
+    width: 90%;
+  }
+  
+  /* Botón de añadir */
+  .game-header-searcher button {
+    background-color: #000;
+    color: white;
     border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
     cursor: pointer;
-    padding: 0;
-    margin-left: 2%;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
   }
   
-  .game-add-button img {
-    width: 30px;
-    height: 30px;
+  .game-header-searcher button:hover {
+    background-color: #292929;
   }
-  
   
 
 
@@ -331,6 +356,10 @@
   .game-card-title{
     transition: font-size 0.5s ease;
   }
+  
+
+
+
   
   @media (max-width: 1440px) {
     .game-card-title {

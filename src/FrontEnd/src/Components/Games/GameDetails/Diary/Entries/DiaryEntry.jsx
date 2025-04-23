@@ -33,6 +33,10 @@ export default function DiaryEntryList() {
   const [showEntryModal, setShowEntryModal] = useState(false);
 
   const [zoomedImage, setZoomedImage] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredEntries = searchTerm
+    ? entries.filter(entry => entry.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    : entries;
 
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -268,18 +272,18 @@ export default function DiaryEntryList() {
   const handleEditEntry = async () => {
     const token = localStorage.getItem('access');
     const formData = new FormData();
-    
+
     formData.append('name', editEntry.name);
     formData.append('description', editEntry.description);
     formData.append('diary', id);
-  
+
     // Si la imagen es un archivo, la enviamos. Si no, no la agregamos a FormData.
     if (editEntry.image1 instanceof File) formData.append('image1', editEntry.image1);
     if (editEntry.image2 instanceof File) formData.append('image2', editEntry.image2);
     if (editEntry.image3 instanceof File) formData.append('image3', editEntry.image3);
-  
+
     console.log("Datos enviados:", [...formData.entries()]);  // Verificar qué se envía
-  
+
     try {
       const response = await fetch(`${BASE_API_URL}/api/gameApp/diaryentries/${editEntry.id}/`, {
         method: 'PUT',
@@ -288,11 +292,11 @@ export default function DiaryEntryList() {
         },
         body: formData,
       });
-  
+
       if (!response.ok) {
         throw new Error('Error al actualizar el diario');
       }
-  
+
       const updatedEntry = await response.json();
       setEntries(prevState =>
         prevState.map(entry => (entry.id === updatedEntry.id ? updatedEntry : entry))
@@ -303,41 +307,56 @@ export default function DiaryEntryList() {
       console.error('Error al actualizar:', error);
     }
   };
-  
-  
+
+
 
   //#endregion 
 
+  //#endregion
   if (loading) return <div>Loading...</div>;
 
   return (
     <div className='entries-container'>
-      <div className="entries-header">
-        <h1>Entradas del {diaryName}</h1>
-        <button className='entries-add-button' onClick={() => setShowModal(true)} title="Añadir una entrada">
-          <img src={Añadir} alt="Añadir" className="add-icon" />
-        </button>
+      <div className="game-header">
+        <div className='game-header-title'><h1>Entradas del {diaryName}</h1></div>
+        <div className="game-header-searcher">
+          <input
+            type="text"
+            placeholder="Buscar partidas..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="game-search-input"
+          />
+          <button className="" onClick={setShowModal} title="Añadir una partida">
+            + Añadir
+          </button>
+        </div>
       </div>
-
+      
       <div className='entries-list'>
-        {currentEntries.length > 0 ? (
-          currentEntries.map((entry) => ( // Eliminar reverse() aquí
-            <div key={entry.id} className='entries-item' onContextMenu={(e) => handleContextMenu(e, entry)} onClick={() => { setSelectedEntry(entry); setShowEntryModal(true); }}>
-              <img src={Entrada} alt="Entry" className="entry-icon" />
-
-              <div className='entries-name'>{entry.name}</div>
-
-            </div>
-          ))
+        {filteredEntries.length > 0 ? (
+          filteredEntries
+            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) // Paginación basada en los resultados de búsqueda
+            .map((entry) => (
+              <div
+                key={entry.id}
+                className='entries-item'
+                onContextMenu={(e) => handleContextMenu(e, entry)}
+                onClick={() => { setSelectedEntry(entry); setShowEntryModal(true); }}
+              >
+                <img src={Entrada} alt="Entry" className="entry-icon" />
+                <div className='entries-name'>{entry.name}</div>
+              </div>
+            ))
         ) : (
           <p className='noEntriesList'>Aún no tienes ninguna entrada. ¡Empieza creando una!</p>
         )}
 
-        {entries.length > itemsPerPage && (
+        {filteredEntries.length > itemsPerPage && (
           <div className="pagination">
             <button onClick={handlePrevPage} disabled={currentPage === 1}>Anterior</button>
-            <span>Página {currentPage} de {totalPages}</span>
-            <button onClick={handleNextPage} disabled={currentPage * itemsPerPage >= entries.length}>Siguiente</button>
+            <span>Página {currentPage} de {Math.ceil(filteredEntries.length / itemsPerPage)}</span>
+            <button onClick={handleNextPage} disabled={currentPage * itemsPerPage >= filteredEntries.length}>Siguiente</button>
           </div>
         )}
       </div>
