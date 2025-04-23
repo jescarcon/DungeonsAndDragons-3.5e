@@ -19,6 +19,8 @@
   max-width: 1200px;
   box-sizing: border-box;
   word-wrap: break-word;
+  user-select: none;
+
 }
 
 

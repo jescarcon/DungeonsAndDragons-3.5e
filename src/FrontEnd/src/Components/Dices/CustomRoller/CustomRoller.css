@@ -10,6 +10,7 @@
   .custom-roller h2 {
     text-align: center;
     margin-top: 0;
+    user-select: none;
   }
   
   /* Campo de entrada */
@@ -37,6 +38,8 @@
     margin-top: 10px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    user-select: none;
+
   }
   
   .custom-roller button:hover {
