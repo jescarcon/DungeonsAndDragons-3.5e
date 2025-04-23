@@ -61,7 +61,7 @@ const Navbar = () => {
           <div className="navbar-icon"><img src={navbarIcon} /></div>
           <div className="navbar-link"><Link to="/games">Mis Partidas</Link></div>
           <div className="navbar-link"><Link to="#">Combate</Link></div>
-          <div className="navbar-link"><Link to="#">Dados</Link></div>
+          <div className="navbar-link"><Link to="/dice-roller">Dados</Link></div>
           <div className="navbar-link"><Link to="#">Librería</Link></div>
           <div className="navbar-link"><Link to="#">Soporte</Link></div>
         </div>

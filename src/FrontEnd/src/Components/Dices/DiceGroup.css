@@ -1,0 +1,46 @@
+/* Contenedor principal */
+.DiceGroup-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  gap: 30px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Título general alineado a la izquierda */
+.dicegroup-title {
+  color: #f0f0f0;
+  border-radius: 8px;
+  text-align: left; /* <- Aquí el cambio clave */
+  font-size: 2rem;
+  width: 100%; /* Que ocupe todo el ancho disponible */
+  max-width: 1200px;
+  box-sizing: border-box;
+  word-wrap: break-word;
+}
+
+
+/* Contenedor de los dos lanzadores */
+.dicegroup-rollers {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 20px;
+}
+
+/* En pantallas grandes, ponerlos en fila */
+@media (min-width: 768px) {
+  .dicegroup-rollers {
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .normal-dice-roller,
+  .custom-dice-roller {
+    flex: 1;
+    max-width: 600px;
+  }
+}

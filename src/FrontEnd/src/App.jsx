@@ -18,6 +18,7 @@ import DiaryEntry from './Components/Games/GameDetails/Diary/Entries/DiaryEntry'
 import Notes from './Components/Games/GameDetails/Notes/Notes';
 import Tavern from './Components/Games/GameDetails/Tavern/Tavern';
 import Profile from './Components/Profile/Profile';
+import DiceGroup from './Components/Dices/DiceGroup';
 
 //#endregion
 
@@ -64,6 +65,9 @@ function App() {
           <Route path="/games/:pk/diaries/:id/entries" element={<ProtectedRoute><DiaryEntry/></ProtectedRoute>} />
           <Route path="/games/:pk/tavern" element={<ProtectedRoute><Tavern/></ProtectedRoute>} />
           <Route path="/games/:pk/notes" element={<ProtectedRoute><Notes/></ProtectedRoute>} />
+          
+          <Route path="/dice-roller" element={<ProtectedRoute><DiceGroup/></ProtectedRoute>} />
+
           <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
 
         </Route>

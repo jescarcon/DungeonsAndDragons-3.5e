@@ -1,0 +1,66 @@
+.custom-roller {
+    background-color: #2e2e2e;
+    color: #f0f0f0;
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .custom-roller h2 {
+    text-align: center;
+    margin-top: 0;
+  }
+  
+  /* Campo de entrada */
+  .custom-roller input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #666;
+    border-radius: 6px;
+    background-color: #1f1f1f;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    margin-top: 10px;
+    box-sizing: border-box;
+  }
+  
+  /* Botones */
+  .custom-roller button {
+    background-color: #444;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 15px;
+    font-size: 14px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .custom-roller button:hover {
+    background-color: #666;
+  }
+  
+  .custom-roller button:nth-child(2) {
+    margin-left: 10px;
+    background-color: #8b8b8b;
+  }
+  
+  .custom-roller button:nth-child(2):hover {
+    background-color: rgb(160, 160, 160);
+  }
+  
+  /* Resultados */
+  .custom-roller .results {
+    margin-top: 20px;
+    background-color: #1f1f1f;
+    padding: 15px;
+    border-radius: 6px;
+  }
+  
+  .custom-roller .results div {
+    margin-bottom: 5px;
+  }
+  
